@@ -57,9 +57,11 @@ void Client::start()
     cin >> tempMail.data;
     send(mSocket, &tempMail ,sizeof (Mail), 0);
     */
-    thread newThread(sendMessenger,mSocket);
-    newThread.join();
-    checkMessenger();
+    thread sendThread(sendMessenger,mSocket);
+    thread checkThread(checkMessenger,mSocket);
+    sendThread.join();
+    checkThread.join();
+    //checkMessenger();
 
 
 
@@ -103,12 +105,12 @@ void Client::sendMessenger(int soket)
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////
-void Client::checkMessenger()
+void Client::checkMessenger(int mSocket)
 /////////////////////////////////////////////////////////////////////////////////////////
 {
     Mail tempMail;
     while (1) {
         recv(mSocket, tempMail.data, sizeof (tempMail.data), 0);
-        cout << tempMail.data << endl;
+        cout << "recv: " << tempMail.data << endl;
     }
 }

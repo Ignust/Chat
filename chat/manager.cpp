@@ -81,8 +81,9 @@ void Manager::processMailType(Mail& mail)
 void Manager::processMailMessage(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
-    cout <<"send mail : " << mail.data << endl;
+    //cout <<"send mail : " << mail.data << endl;
     for(set<int>::iterator it = mClients.begin(); it != mClients.end(); it++){
+        cout <<"send mail : " << mail.data << "from: " << *it << endl;
         send(*it, mail.data, sizeof (mail.data), 0);
     }
 }
