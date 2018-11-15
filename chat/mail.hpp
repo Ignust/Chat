@@ -11,6 +11,7 @@ struct Mail
 {
     MAIL_TYPE typeMail;
     char data [1024];
+    int clientId;
 };
 
 #endif // MAIL_HPP

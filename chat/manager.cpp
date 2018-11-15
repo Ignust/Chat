@@ -28,6 +28,7 @@ void Manager::pushMail(int client)
 {
     Mail tempMail;
     recv(client,&tempMail,sizeof (Mail),0);
+    tempMail.clientId = client;
     mMails.push(tempMail);
 }
 //------------------------------------------------------------------------------------------
@@ -83,8 +84,10 @@ void Manager::processMailMessage(Mail& mail)
 {
     //cout <<"send mail : " << mail.data << endl;
     for(set<int>::iterator it = mClients.begin(); it != mClients.end(); it++){
-        cout <<"send mail : " << mail.data << "from: " << *it << endl;
-        send(*it, mail.data, sizeof (mail.data), 0);
+        if((*it) != mail.clientId){
+            cout <<"send mail : " << mail.data << "from: " << *it << endl;
+            send(*it, mail.data, sizeof (mail.data), 0);
+        }
     }
 }
 //------------------------------------------------------------------------------------------

@@ -51,29 +51,10 @@ bool Client::initClient()
 void Client::start()
 /////////////////////////////////////////////////////////////////////////////////////////
 {
-    /*
-    Mail tempMail;
-    tempMail.typeMail = MESSAGE;
-    cin >> tempMail.data;
-    send(mSocket, &tempMail ,sizeof (Mail), 0);
-    */
     thread sendThread(sendMessenger,mSocket);
     thread checkThread(checkMessenger,mSocket);
     sendThread.join();
     checkThread.join();
-    //checkMessenger();
-
-
-
-/*
-    pthread_t newThread;
-    pthread_create(&newThread, NULL,sendMessenger, this);
-    checkMessenger();
-    pthread_join(newThread,NULL);
-
-
-*/
-
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 bool Client::disconnectClient()
