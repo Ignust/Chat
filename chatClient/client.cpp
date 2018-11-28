@@ -2,6 +2,9 @@
 #include<iostream>
 #include<pthread.h>
 #include<thread>
+#include<sys/epoll.h>
+#include <cstring>
+#include<unistd.h>
 
 using namespace std;
 
@@ -51,10 +54,21 @@ bool Client::initClient()
 void Client::start()
 /////////////////////////////////////////////////////////////////////////////////////////
 {
+    while (true) {
+        checkMessenger();
+        sendMessenger();
+
+
+    }
+
+
+
+    /*
     thread sendThread(sendMessenger,mSocket);
-    thread checkThread(checkMessenger,mSocket);
+    thread checkThread(checkMessenger,mSocket);recv()
     sendThread.join();
     checkThread.join();
+    */
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 bool Client::disconnectClient()
@@ -64,11 +78,36 @@ bool Client::disconnectClient()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
+void Client::sendMessenger()
+/////////////////////////////////////////////////////////////////////////////////////////
+{
+    int epollFd = epoll_create1(0);
+
+    epoll_event eventFd;
+    epoll_event events[20];
+    eventFd.events = EPOLLIN;
+    eventFd.data.fd = 0;
+    epoll_ctl(epollFd, EPOLL_CTL_ADD, 0, &eventFd);
+    int amountEvents = epoll_wait(epollFd, events, 20, -1);
+    for(int a = 0; a < amountEvents; ++a){
+        Mail tempMail;
+        memset(tempMail.data, 0, sizeof(tempMail.data));
+        tempMail.data[0] = 0;
+        tempMail.typeMail = MESSAGE;
+        read(events[a].data.fd, tempMail.data,sizeof(tempMail.data));
+
+        if(tempMail.data[0]!=0){
+            cout <<" tempMail.data: " << tempMail.data << endl;
+            send(mSocket, &tempMail, sizeof (tempMail), 0);
+        }
+
+    }
+}
+/*
+/////////////////////////////////////////////////////////////////////////////////////////
 void Client::sendMessenger(int soket)
 /////////////////////////////////////////////////////////////////////////////////////////
 {
-    //Client& mClient = (Client&)client;
-
     Mail tempMail;
     tempMail.typeMail = MESSAGE;
     while (true) {
@@ -77,14 +116,30 @@ void Client::sendMessenger(int soket)
         send(soket, &tempMail ,sizeof (Mail), 0);
     }
 
-    /*
-    Mail tempMail;
-    tempMail.typeMail = MESSAGE;
-    cin >> tempMail.data;
-    send(soket, &tempMail ,sizeof (Mail), 0);
-    */
-
 }
+*/
+/////////////////////////////////////////////////////////////////////////////////////////
+void Client::checkMessenger()
+/////////////////////////////////////////////////////////////////////////////////////////
+{
+    int epollFd = epoll_create1(0);
+
+    epoll_event eventFd;
+    epoll_event events[20];
+    eventFd.events = EPOLLIN;
+    eventFd.data.fd = mSocket;
+    epoll_ctl(epollFd, EPOLL_CTL_ADD, mSocket, &eventFd);
+    int amountEvents = epoll_wait(epollFd, events, 20, -1);
+    for(int i = 0; i < amountEvents; ++i){
+        Mail tempMail;
+        recv(events[i].data.fd, tempMail.data, sizeof (tempMail.data), 0);
+        if(tempMail.data[0] != 0){
+            cout << "recv: " << tempMail.data << endl;
+        }
+
+    }
+}
+/*
 /////////////////////////////////////////////////////////////////////////////////////////
 void Client::checkMessenger(int mSocket)
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -95,3 +150,4 @@ void Client::checkMessenger(int mSocket)
         cout << "recv: " << tempMail.data << endl;
     }
 }
+*/

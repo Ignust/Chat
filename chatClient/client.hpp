@@ -17,8 +17,8 @@ public:
 
 private:
     bool initClient();
-    static void sendMessenger(int);
-    static void checkMessenger(int);
+    void sendMessenger();
+    void checkMessenger();
 
 private:
 
