@@ -14,7 +14,7 @@ public:
 private:
     void subscribeClient();
     void unsubscribeClient();
-    void sendMail(int);
+    bool sendMail(int);
 
 private:
     Server& mServer;

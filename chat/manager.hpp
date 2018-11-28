@@ -14,7 +14,8 @@ public:
     Manager();
 
     void pushClient(int);
-    void pushMail(int);
+    void popClient(int);
+    bool pushMail(int);
     void processMails();
     int getAmountOfClient();
     int getClient(int);

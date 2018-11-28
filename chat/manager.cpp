@@ -19,17 +19,34 @@ Manager::Manager()
 void Manager::pushClient(int newClient)
 //------------------------------------------------------------------------------------------
 {
+    char welcomeMsg[] = "Welcom to the Chat Serve";
+    send(newClient, &welcomeMsg, sizeof (welcomeMsg), 0);
     cout << "newClient = " << newClient << endl;
     mClients.insert(newClient);
 }
 //------------------------------------------------------------------------------------------
-void Manager::pushMail(int client)
+void Manager::popClient(int Client)
+//------------------------------------------------------------------------------------------
+{
+    cout << "erase: Client = " << Client << endl;
+    mClients.erase(Client);
+}
+//------------------------------------------------------------------------------------------
+bool Manager::pushMail(int client)
 //------------------------------------------------------------------------------------------
 {
     Mail tempMail;
-    recv(client,&tempMail,sizeof (Mail),0);
-    tempMail.clientId = client;
-    mMails.push(tempMail);
+    int bytesRecv;
+    bytesRecv = recv(client,&tempMail,sizeof (Mail),0);
+    if(bytesRecv <= 0){
+        //Drop the client
+        return false;
+    }else {
+        tempMail.clientId = client;
+        mMails.push(tempMail);
+        return true;
+}
+
 }
 //------------------------------------------------------------------------------------------
 void Manager::processMails()
