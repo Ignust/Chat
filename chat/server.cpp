@@ -57,7 +57,7 @@ void Server::disconectClient(int fD)
 {
     shutdown(fD, SHUT_RDWR);
     close(fD);
-    cout << "client: " << fD << "is disconect" << endl;
+    cout << "client: " << fD << " is disconnected" << endl;
 }
 //------------------------------------------------------------------------------------------
 int Server::listenClients()

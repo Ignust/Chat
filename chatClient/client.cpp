@@ -6,6 +6,7 @@
 #include <cstring>
 #include<unistd.h>
 #include<fcntl.h>
+#include<cstring>
 
 using namespace std;
 
@@ -17,6 +18,7 @@ Client::Client()
     , mSet()
     , mMail()
 {
+    memset(clientName, 0, sizeof (clientName));
     if(initClient()){
         cout << "       Client init" << endl;
     }else{
@@ -56,21 +58,13 @@ bool Client::initClient()
 void Client::start()
 /////////////////////////////////////////////////////////////////////////////////////////
 {
+    getClientName();
+    sendClientName();
     while (true) {
         checkMessenger();
         sendMessenger();
-
-
     }
 
-
-
-    /*
-    thread sendThread(sendMessenger,mSocket);
-    thread checkThread(checkMessenger,mSocket);recv()
-    sendThread.join();
-    checkThread.join();
-    */
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 bool Client::disconnectClient()
@@ -104,26 +98,10 @@ void Client::sendMessenger()
 
     }
 }
-/*
-/////////////////////////////////////////////////////////////////////////////////////////
-void Client::sendMessenger(int soket)
-/////////////////////////////////////////////////////////////////////////////////////////
-{
-    Mail tempMail;
-    tempMail.typeMail = MESSAGE;
-    while (true) {
-        cout << "Enter messenger" << endl;
-        cin >> tempMail.data;
-        send(soket, &tempMail ,sizeof (Mail), 0);
-    }
-
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////
 void Client::checkMessenger()
 /////////////////////////////////////////////////////////////////////////////////////////
 {
-
     int epollFd = epoll_create1(0);
 
     epoll_event eventFd;
@@ -142,15 +120,20 @@ void Client::checkMessenger()
 
     }
 }
-/*
 /////////////////////////////////////////////////////////////////////////////////////////
-void Client::checkMessenger(int mSocket)
+void Client::getClientName()
+/////////////////////////////////////////////////////////////////////////////////////////
+{
+    cout << "Enter Name" << endl;
+    cin >> clientName;
+}
+/////////////////////////////////////////////////////////////////////////////////////////
+void Client::sendClientName()
 /////////////////////////////////////////////////////////////////////////////////////////
 {
     Mail tempMail;
-    while (1) {
-        recv(mSocket, tempMail.data, sizeof (tempMail.data), 0);
-        cout << "recv: " << tempMail.data << endl;
-    }
+    tempMail.typeMail = COMMAND;
+    memset(tempMail.data, 0 ,sizeof (tempMail.data));
+    strncpy(tempMail.data, clientName, sizeof (clientName));
+    send(mSocket, &tempMail, sizeof (Mail), 0);
 }
-*/

@@ -19,7 +19,7 @@ Manager::Manager()
 void Manager::pushClient(int newClient)
 //------------------------------------------------------------------------------------------
 {
-    char welcomeMsg[] = "Welcom to the Chat Serve";
+    char welcomeMsg[] = "Welcome to the Chat Server";
     send(newClient, &welcomeMsg, sizeof (welcomeMsg), 0);
     cout << "newClient = " << newClient << endl;
     mClients.insert(newClient);
@@ -111,7 +111,7 @@ void Manager::processMailMessage(Mail& mail)
 void Manager::processMailCommand(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
-
+    cout << "(processMailCommand) get: " << mail.data << endl;
 }
 
 

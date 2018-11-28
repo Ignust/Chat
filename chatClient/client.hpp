@@ -7,6 +7,7 @@
 
 #define PORT_ADDR 12345
 #define AMOUNT_EVENTS 5
+#define ARRAY_SIZE 20
 
 class Client
 {
@@ -20,6 +21,8 @@ private:
     bool initClient();
     void sendMessenger();
     void checkMessenger();
+    void getClientName();
+    void sendClientName();
 
 private:
 
@@ -27,6 +30,7 @@ private:
     struct sockaddr_in mSockAddr;
     fd_set mSet;
     Mail mMail;
+    char clientName[ARRAY_SIZE];
 
 };
 
