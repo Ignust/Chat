@@ -115,7 +115,7 @@ void Client::checkMessenger()
         memset(tempMail.data, 0, sizeof(tempMail.data));
         read(events[i].data.fd, tempMail.data, sizeof (tempMail.data));
         if(tempMail.data[0] != 0){
-            cout << "recv: " << tempMail.data << endl;
+            cout << "recv: " << tempMail.data << flush;
         }
 
     }
