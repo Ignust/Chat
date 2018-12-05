@@ -6,6 +6,7 @@
 #include"mail.hpp"
 
 #define PORT_ADDR 12345
+#define AMOUNT_EVENTS 5
 
 class Client
 {

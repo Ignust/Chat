@@ -55,7 +55,7 @@ void EventHandler::start()
             if(FD_ISSET(client_Id,&readset)){
                 cout <<"get respons for " << client_Id << endl;
                 if(!(sendMail(client_Id))){
-                    unsubscribeClient();
+                    unsubscribeClient(client_Id);
                 }
             }
         }
@@ -69,11 +69,11 @@ void EventHandler::subscribeClient()
    mManager.pushClient(mServer.listenClients());
 }
 //------------------------------------------------------------------------------------------
-void EventHandler::unsubscribeClient()
+void EventHandler::unsubscribeClient(int client)
 //------------------------------------------------------------------------------------------
 {
-
-
+    mManager.popClient(client);
+    mServer.disconectClient(client);
 }
 //------------------------------------------------------------------------------------------
 bool EventHandler::sendMail(int mail)

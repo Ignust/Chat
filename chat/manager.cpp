@@ -56,7 +56,7 @@ void Manager::processMails()
         processMailType(mMails.front());
         mMails.pop();
     }else{
-        cout <<"Mail empty" << endl;
+        //cout <<"Mail empty" << endl;
     }
 }
 //------------------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ void Manager::processMailMessage(Mail& mail)
     //cout <<"send mail : " << mail.data << endl;
     for(set<int>::iterator it = mClients.begin(); it != mClients.end(); it++){
         if((*it) != mail.clientId){
-            cout <<"send mail : " << mail.data << "from: " << *it << endl;
+            cout <<"send mail " << "from: " << *it <<": " << mail.data << endl;
             send(*it, mail.data, sizeof (mail.data), 0);
         }
     }

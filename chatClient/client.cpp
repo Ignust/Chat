@@ -5,6 +5,7 @@
 #include<sys/epoll.h>
 #include <cstring>
 #include<unistd.h>
+#include<fcntl.h>
 
 using namespace std;
 
@@ -37,6 +38,7 @@ bool Client::initClient()
         cout << "mSocket was created" << endl;
     }
     //fcntl(mSocket, F_SETFL, O_NONBLOCK);
+
 
     mSockAddr.sin_family = AF_INET;
     mSockAddr.sin_port = htons(PORT_ADDR);
@@ -84,21 +86,20 @@ void Client::sendMessenger()
     int epollFd = epoll_create1(0);
 
     epoll_event eventFd;
-    epoll_event events[20];
+    epoll_event events[AMOUNT_EVENTS];
     eventFd.events = EPOLLIN;
     eventFd.data.fd = 0;
     epoll_ctl(epollFd, EPOLL_CTL_ADD, 0, &eventFd);
-    int amountEvents = epoll_wait(epollFd, events, 20, -1);
+    int amountEvents = epoll_wait(epollFd, events, AMOUNT_EVENTS, 500);
     for(int a = 0; a < amountEvents; ++a){
         Mail tempMail;
         memset(tempMail.data, 0, sizeof(tempMail.data));
-        tempMail.data[0] = 0;
         tempMail.typeMail = MESSAGE;
         read(events[a].data.fd, tempMail.data,sizeof(tempMail.data));
-
+        //cout << "read" << endl;
         if(tempMail.data[0]!=0){
-            cout <<" tempMail.data: " << tempMail.data << endl;
-            send(mSocket, &tempMail, sizeof (tempMail), 0);
+            //cout <<" tempMail.data: " << tempMail.data << endl;
+            send(mSocket, &tempMail, sizeof (Mail), 0);
         }
 
     }
@@ -122,17 +123,19 @@ void Client::sendMessenger(int soket)
 void Client::checkMessenger()
 /////////////////////////////////////////////////////////////////////////////////////////
 {
+
     int epollFd = epoll_create1(0);
 
     epoll_event eventFd;
-    epoll_event events[20];
+    epoll_event events[AMOUNT_EVENTS];
     eventFd.events = EPOLLIN;
     eventFd.data.fd = mSocket;
     epoll_ctl(epollFd, EPOLL_CTL_ADD, mSocket, &eventFd);
-    int amountEvents = epoll_wait(epollFd, events, 20, -1);
+    int amountEvents = epoll_wait(epollFd, events, AMOUNT_EVENTS, 500);
     for(int i = 0; i < amountEvents; ++i){
         Mail tempMail;
-        recv(events[i].data.fd, tempMail.data, sizeof (tempMail.data), 0);
+        memset(tempMail.data, 0, sizeof(tempMail.data));
+        read(events[i].data.fd, tempMail.data, sizeof (tempMail.data));
         if(tempMail.data[0] != 0){
             cout << "recv: " << tempMail.data << endl;
         }

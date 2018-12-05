@@ -7,7 +7,7 @@ class Server
 public:
 
     static Server& initServer();
-    bool disconectServer();
+    void disconectClient(int);
     int listenClients();
     int getServer();
 

@@ -52,10 +52,12 @@ Server& Server::initServer()
 
 }
 //------------------------------------------------------------------------------------------
-bool Server::disconectServer()
+void Server::disconectClient(int fD)
 //------------------------------------------------------------------------------------------
 {
-    close(masterSocket);
+    shutdown(fD, SHUT_RDWR);
+    close(fD);
+    cout << "client: " << fD << "is disconect" << endl;
 }
 //------------------------------------------------------------------------------------------
 int Server::listenClients()
@@ -81,5 +83,5 @@ int Server::getServer()
 Server::~Server()
 //------------------------------------------------------------------------------------------
 {
-
+    close(masterSocket);
 }

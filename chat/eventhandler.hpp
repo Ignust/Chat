@@ -13,7 +13,7 @@ public:
     void start();
 private:
     void subscribeClient();
-    void unsubscribeClient();
+    void unsubscribeClient(int);
     bool sendMail(int);
 
 private:
