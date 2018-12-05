@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
+<<<<<<< HEAD
 <!-- Written by QtCreator 4.7.2, 2018-12-05T14:22:46. -->
+=======
+<!-- Written by QtCreator 4.7.2, 2018-12-04T14:46:13. -->
+>>>>>>> 1ca4609529a9c8b0f7b11e21706302bee0e1bfc6
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -307,7 +311,11 @@
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">chatClient</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">chatClient2</value>
+<<<<<<< HEAD
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/andrey/c++/1/Chat/chatClient/chatClient.pro</value>
+=======
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/andrey/c++/chat/Chat/chatClient/chatClient.pro</value>
+>>>>>>> 1ca4609529a9c8b0f7b11e21706302bee0e1bfc6
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">chatClient.pro</value>
