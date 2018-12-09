@@ -3,6 +3,7 @@
 #include<iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include<cstring>
 
 using namespace std;
 
@@ -117,7 +118,26 @@ void Manager::processMailMessage(Mail& mail)
 void Manager::processMailCommand(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
-    cout << "(processMailCommand) get: " << mail.data << endl;
+    if (checkNewClientName(mail)){
+        for(list<Client>::iterator it = mClients.begin(); it != mClients.end(); it++){
+            if(it->clientId == mail.clientId){
+                strncpy(it->clientName, mail.data, sizeof (mail.data));
+                cout << "ClientId: " << it->clientId << " ClientName: " << it->clientName << endl;
+            }
+        }
+    }else {
+        cout << "Fail add clientName to " << mail.clientId << endl;
 }
-
+}
+//------------------------------------------------------------------------------------------
+bool Manager::checkNewClientName(Mail& mail)
+//------------------------------------------------------------------------------------------
+{
+    for(list<Client>::iterator it = mClients.begin(); it != mClients.end(); it++){
+        if(0 == strcmp(it->clientName, mail.data) ){
+            return false;
+        }
+    }
+    return true;
+}
 

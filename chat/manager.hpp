@@ -27,6 +27,7 @@ private:
     void processMailType(Mail&);
     void processMailMessage(Mail&);
     void processMailCommand(Mail&);
+    bool checkNewClientName(Mail&);
 
 
 
