@@ -3,15 +3,15 @@
 
 #include <algorithm>
 
-#include"Server.hpp"
-#include"Manager.hpp"
+#include "Server.hpp"
+#include "Manager.hpp"
 
 class EventHandler
 {
 public:
     EventHandler();
 
-    void start();
+    void start[[noreturn]]();
 
 private:
     void subscribeClient();

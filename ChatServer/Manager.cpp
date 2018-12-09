@@ -33,7 +33,7 @@ void Manager::popClient(int ClientId)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::popClient: ClientId = " << ClientId;
-    for (list<Client>::iterator it = mClients.begin(); it != mClients.end(); ++it) {
+    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
         if (it->clientId == ClientId) {
             mClients.erase(it);
             cout << " was erased";
@@ -104,7 +104,6 @@ void Manager::processMailType(Mail& mail)
         break;
     default:
         cout << "ERROR: Manager::processMailType: mail.typeMail = "<< mail.typeMail << endl;
-        break;
     }
 }
 
@@ -112,7 +111,7 @@ void Manager::processMailType(Mail& mail)
 void Manager::processMailMessage(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
-    for (list<Client>::iterator it = mClients.begin(); it != mClients.end(); ++it) {
+    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
         if (it->clientId != mail.clientId /*&& it->clientName != NULL*/) {
             cout <<"Manager::processMailMessage: id = " << it->clientId <<"; data: " << mail.data << flush;
             send(it->clientId, mail.data, sizeof (mail.data), 0);
@@ -125,7 +124,7 @@ void Manager::processMailCommand(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     if (checkNewClientName(mail)) {
-        for (list<Client>::iterator it = mClients.begin(); it != mClients.end(); ++it) {
+        for (auto it = mClients.begin(); it != mClients.end(); ++it) {
             if (it->clientId == mail.clientId) {
                 strncpy(it->clientName, mail.data, sizeof (mail.data));
                 cout << "Manager::processMailCommand:"
@@ -142,7 +141,7 @@ void Manager::processMailCommand(Mail& mail)
 bool Manager::checkNewClientName(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
-    for (list<Client>::iterator it = mClients.begin(); it != mClients.end(); ++it) {
+    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
         if (0 == strcmp(it->clientName, mail.data) ) {
             return false;
         }

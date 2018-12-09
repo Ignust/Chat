@@ -5,6 +5,7 @@ enum MAIL_TYPE
 {
     MESSAGE
     , COMMAND
+    , LAST_TYPE
 };
 
 struct Mail
