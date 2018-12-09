@@ -1,5 +1,5 @@
-#ifndef MAIL_HPP
-#define MAIL_HPP
+#ifndef MAILTYPES_HPP
+#define MAILTYPES_HPP
 
 enum MAIL_TYPE
 {
@@ -10,8 +10,8 @@ enum MAIL_TYPE
 struct Mail
 {
     MAIL_TYPE typeMail;
-    char data [1024];
+    char data[1024];
     int clientId;
 };
 
-#endif // MAIL_HPP
+#endif // MAILTYPES_HPP

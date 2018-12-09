@@ -1,15 +1,13 @@
 #ifndef MANAGER_HPP
 #define MANAGER_HPP
-#include"mail.hpp"
-#include"client.h"
 
-#include<set>
-using std::set;
-#include<queue>
+#include <queue>
 using std::queue;
-#include<list>
+#include <list>
 using std::list;
 
+#include "ClientTypes.hpp"
+#include "MailTypes.hpp"
 
 class Manager
 {
@@ -20,7 +18,7 @@ public:
     void popClient(int);
     bool pushMail(int);
     void processMails();
-    int getAmountOfClient();
+    int getAmountOfClient() const;
     int getClient(int);
 
 private:
@@ -29,14 +27,9 @@ private:
     void processMailCommand(Mail&);
     bool checkNewClientName(Mail&);
 
-
-
 private:
     list<Client> mClients;
     queue<Mail> mMails;
-
-
-
 };
 
 #endif // MANAGER_HPP
