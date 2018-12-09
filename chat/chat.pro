@@ -13,4 +13,5 @@ HEADERS += \
     server.hpp \
     manager.hpp \
     mail.hpp \
-    eventhandler.hpp
+    eventhandler.hpp \
+    client.h
