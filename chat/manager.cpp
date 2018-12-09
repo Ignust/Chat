@@ -19,17 +19,23 @@ Manager::Manager()
 void Manager::pushClient(int newClient)
 //------------------------------------------------------------------------------------------
 {
-    char welcomeMsg[] = "Welcome to the Chat Server";
+    char welcomeMsg[] = "Welcom to the Chat Serve";
     send(newClient, &welcomeMsg, sizeof (welcomeMsg), 0);
     cout << "newClient = " << newClient << endl;
-    mClients.insert(newClient);
+    Client tempClient;
+    tempClient.clientId = newClient;
+    mClients.push_back(tempClient);
 }
 //------------------------------------------------------------------------------------------
-void Manager::popClient(int Client)
+void Manager::popClient(int ClientId)
 //------------------------------------------------------------------------------------------
 {
-    cout << "erase: Client = " << Client << endl;
-    mClients.erase(Client);
+    cout << "erase: Client = " << ClientId << endl;
+    for(list<Client>::iterator it = mClients.begin(); it != mClients.end(); it++){
+        if(it->clientId == ClientId){
+            mClients.erase(it);
+        }
+    }
 }
 //------------------------------------------------------------------------------------------
 bool Manager::pushMail(int client)
@@ -46,7 +52,6 @@ bool Manager::pushMail(int client)
         mMails.push(tempMail);
         return true;
 }
-
 }
 //------------------------------------------------------------------------------------------
 void Manager::processMails()
@@ -67,9 +72,10 @@ int Manager::getAmountOfClient()
 }
 //------------------------------------------------------------------------------------------
 int Manager::getClient(int number)
+//------------------------------------------------------------------------------------------
 {
     //cout << "getClient()" << endl;
-    set<int>::iterator it = mClients.begin();
+    list<Client>::iterator it = mClients.begin();
     //cout << "it = " << *it << endl;
     while (number != 0) {
         it++;
@@ -77,7 +83,7 @@ int Manager::getClient(int number)
         //cout << "it = " << *it << endl;
     }
 
-    return *(it);
+    return it->clientId;
 }
 //------------------------------------------------------------------------------------------
 void Manager::processMailType(Mail& mail)
@@ -100,10 +106,10 @@ void Manager::processMailMessage(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     //cout <<"send mail : " << mail.data << endl;
-    for(set<int>::iterator it = mClients.begin(); it != mClients.end(); it++){
-        if((*it) != mail.clientId){
-            cout <<"send mail " << "from: " << *it <<": " << mail.data << endl;
-            send(*it, mail.data, sizeof (mail.data), 0);
+    for(list<Client>::iterator it = mClients.begin(); it != mClients.end(); it++){
+        if(it->clientId != mail.clientId /*&& it->clientName != NULL*/){
+            cout <<"send mail " << "from: " << it->clientId <<": " << mail.data << endl;
+            send(it->clientId, mail.data, sizeof (mail.data), 0);
         }
     }
 }
