@@ -3,7 +3,7 @@
 
 #include <netinet/in.h>
 #include<sys/select.h>
-#include"mail.hpp"
+#include"MailTypes.hpp"
 
 #define PORT_ADDR 12345
 #define AMOUNT_EVENTS 5
@@ -13,9 +13,8 @@ class Client
 {
 public:
     Client();
-    void start();
-    bool disconnectClient();
-
+    void start[[noreturn]]();
+    void disconnectClient();
 
 private:
     bool initClient();
@@ -23,6 +22,8 @@ private:
     void checkMessenger();
     void getClientName();
     void sendClientName();
+    bool createSocket();
+    bool connectSocket();
 
 private:
 

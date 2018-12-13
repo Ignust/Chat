@@ -11,5 +11,5 @@ SOURCES += \
     client.cpp
 
 HEADERS += \
-    mail.hpp \
-    client.hpp
+    Client.hpp \
+    MailTypes.hpp

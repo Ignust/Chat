@@ -1,4 +1,4 @@
-#include"client.hpp"
+#include"Client.hpp"
 #include<iostream>
 
 
@@ -6,8 +6,8 @@
 
 int main()
 {
-    Client mClient;
-    mClient.start();
+    Client chatClient;
+    chatClient.start();
 
     return 0;
 }
