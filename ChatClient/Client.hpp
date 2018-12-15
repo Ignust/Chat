@@ -24,6 +24,9 @@ private:
     void sendClientName();
     bool createSocket();
     bool connectSocket();
+    void processMailType(Mail&);
+    void processMailMessage(Mail&);
+    void processMailCommand(Mail&);
 
 private:
 

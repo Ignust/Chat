@@ -99,11 +99,13 @@ void Client::checkMessenger()
     int amountEvents = epoll_wait(epollFd, events, AMOUNT_EVENTS, 500);
     for (int i = 0; i < amountEvents; ++i) {
         Mail tempMail;
-        memset(tempMail.data, 0, sizeof(tempMail.data));
-        read(events[i].data.fd, tempMail.data, sizeof (tempMail.data));
-        if (tempMail.data[0] != 0) {
-            cout << "recv: " << tempMail.data << flush;
-        }
+        //memset(tempMail.data, 0, sizeof(tempMail.data));
+        //read(events[i].data.fd, tempMail.data, sizeof (tempMail.data));
+        read(events[i].data.fd, &tempMail, sizeof (Mail));
+        processMailType(tempMail);
+        //if (tempMail.data[0] != 0) {
+            //cout << "recv: " << tempMail.data << flush;
+        //}
 
     }
 }
@@ -156,4 +158,36 @@ bool Client::connectSocket()
         cout << "Client::connectSocket: mSocket is connecting" << endl;
         return true;
     }
+}
+
+//-----------------------------------------------------------------------------
+void Client::processMailType(Mail& mail)
+//-----------------------------------------------------------------------------
+{
+    switch (mail.typeMail) {
+    case MESSAGE:
+        processMailMessage(mail);
+        break;
+    case COMMAND:
+        processMailCommand(mail);
+        break;
+    default:
+        cout << "ERROR: Client::processMailType: mail.typeMail = "<< mail.typeMail << endl;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void Client::processMailMessage(Mail& mail)
+//-----------------------------------------------------------------------------
+{
+    if (mail.data[0] != 0) {
+        cout << "recv: " << mail.data << flush;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void Client::processMailCommand(Mail& mail)
+//-----------------------------------------------------------------------------
+{
+    cout << "Client::processMailCommand:" << endl;
 }

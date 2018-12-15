@@ -114,7 +114,7 @@ void Manager::processMailMessage(Mail& mail)
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
         if (it->clientId != mail.clientId /*&& it->clientName != NULL*/) {
             cout <<"Manager::processMailMessage: id = " << it->clientId <<"; data: " << mail.data << flush;
-            send(it->clientId, mail.data, sizeof (mail.data), 0);
+            send(it->clientId, &mail, sizeof (Mail), 0);
         }
     }
 }
