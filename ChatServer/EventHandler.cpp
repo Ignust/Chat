@@ -17,7 +17,7 @@ EventHandler::EventHandler()
 void EventHandler::start[[noreturn]]()
 //-----------------------------------------------------------------------------
 {
-    while (1) {        
+    while (1) {
         initReadSet();
         checkNewClient();
         checkNewMails();
@@ -36,6 +36,7 @@ void EventHandler::subscribeClient()
 void EventHandler::unsubscribeClient(int client)
 //-----------------------------------------------------------------------------
 {
+    std::cout << "EventHandler::unsubscribeClient: client = " << client << std::endl;
     mManager.popClient(client);
     mServer.disconectClient(client);
 }
@@ -96,7 +97,7 @@ void EventHandler::checkNewMails()
     for (int i = mManager.getAmountOfClient(), client_Id = 0; i >= 0 ; --i) {
         client_Id = mManager.getClient(i);
         if (FD_ISSET(client_Id,&mReadset)) {
-            std::cout << "get respons for " << client_Id << std::endl;
+            std::cout << "EventHandler::checkNewMails: get respons for " << client_Id << std::endl;
             if (!(sendMail(client_Id))) {
                 unsubscribeClient(client_Id);
             }

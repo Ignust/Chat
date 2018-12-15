@@ -5,6 +5,7 @@ enum MAIL_TYPE
 {
     MESSAGE
     , COMMAND
+    , CLIENT_LOGIN
     , LAST_TYPE
 };
 
@@ -16,3 +17,5 @@ struct Mail
 };
 
 #endif // MAILTYPES_HPP
+
+

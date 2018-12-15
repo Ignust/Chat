@@ -20,13 +20,14 @@ private:
     bool initClient();
     void sendMessenger();
     void checkMessenger();
-    void getClientName();
-    void sendClientName();
+    char* getmClientName(char *);
+    void sendClientName(char *);
     bool createSocket();
     bool connectSocket();
     void processMailType(Mail&);
     void processMailMessage(Mail&);
     void processMailCommand(Mail&);
+    void processMailClientLOgin(Mail&);
 
 private:
 
@@ -34,7 +35,7 @@ private:
     struct sockaddr_in mSockAddr;
     fd_set mSet;
     Mail mMail;
-    char clientName[ARRAY_SIZE];
+    char mClientName[ARRAY_SIZE];
 
 };
 

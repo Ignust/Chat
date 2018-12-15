@@ -18,7 +18,7 @@ Client::Client()
     , mSet()
     , mMail()
 {
-    memset(clientName, 0, sizeof (clientName));
+    memset(mClientName, 0, sizeof (mClientName));
     if (initClient()) {
         cout << "Client::Client: Client init" << endl;
     } else {
@@ -43,13 +43,11 @@ bool Client::initClient()
 void Client::start[[noreturn]]()
 //-----------------------------------------------------------------------------
 {
-    getClientName();
-    sendClientName();
+    sendClientName(getmClientName(mClientName));
     while (true) {
         checkMessenger();
         sendMessenger();
     }
-
 }
 
 //-----------------------------------------------------------------------------
@@ -101,8 +99,9 @@ void Client::checkMessenger()
         Mail tempMail;
         //memset(tempMail.data, 0, sizeof(tempMail.data));
         //read(events[i].data.fd, tempMail.data, sizeof (tempMail.data));
-        read(events[i].data.fd, &tempMail, sizeof (Mail));
-        processMailType(tempMail);
+        if(0 <= read(events[i].data.fd, &tempMail, sizeof (Mail))){
+            processMailType(tempMail);
+        }
         //if (tempMail.data[0] != 0) {
             //cout << "recv: " << tempMail.data << flush;
         //}
@@ -111,21 +110,24 @@ void Client::checkMessenger()
 }
 
 //-----------------------------------------------------------------------------
-void Client::getClientName()
+char* Client::getmClientName( char* name)
 //-----------------------------------------------------------------------------
 {
+    //static char name[1024];
     cout << "Enter Name" << endl;
-    cin >> clientName;
+    cin >> name;
+    cout << "Client::getmClientName: name = " << name << endl;
+    return name;
 }
 
 //-----------------------------------------------------------------------------
-void Client::sendClientName()
+void Client::sendClientName(char * name)
 //-----------------------------------------------------------------------------
 {
     Mail tempMail;
-    tempMail.typeMail = COMMAND;
+    tempMail.typeMail = CLIENT_LOGIN;
     memset(tempMail.data, 0 ,sizeof (tempMail.data));
-    strncpy(tempMail.data, clientName, sizeof (clientName));
+    strncpy(tempMail.data, name, sizeof (mClientName));
     send(mSocket, &tempMail, sizeof (Mail), 0);
 }
 
@@ -171,6 +173,9 @@ void Client::processMailType(Mail& mail)
     case COMMAND:
         processMailCommand(mail);
         break;
+    case CLIENT_LOGIN:
+        processMailClientLOgin(mail);
+        break;
     default:
         cout << "ERROR: Client::processMailType: mail.typeMail = "<< mail.typeMail << endl;
     }
@@ -189,5 +194,18 @@ void Client::processMailMessage(Mail& mail)
 void Client::processMailCommand(Mail& mail)
 //-----------------------------------------------------------------------------
 {
-    cout << "Client::processMailCommand:" << endl;
+    cout << "Client::processMailCommand:" << mail.data << endl;
+}
+
+//-----------------------------------------------------------------------------
+void Client::processMailClientLOgin(Mail& mail)
+//-----------------------------------------------------------------------------
+{
+    if(mail.data[0] != 0){
+        cout << "Log in to the server with a nickname: " << mClientName << endl;
+    } else{
+        memset(mClientName, 0,sizeof(mClientName));
+        sendClientName(getmClientName(mClientName));
+        cout << "Name not available"<< endl;
+    }
 }

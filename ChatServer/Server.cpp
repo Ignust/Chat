@@ -38,6 +38,7 @@ Server::~Server()
 void Server::disconectClient(int fD)
 //-----------------------------------------------------------------------------
 {
+    cout << "Server::disconectClient: fD = " << fD << endl;
     shutdown(fD, SHUT_RDWR);
     close(fD);
     cout << "Server::disconectClient: client: " << fD << " is disconnected" << endl;

@@ -20,8 +20,8 @@ Manager::Manager()
 void Manager::pushClient(int newClient)
 //------------------------------------------------------------------------------------------
 {
-    const char *welcomeMsg = "Welcome to the ChatServer";
-    send(newClient, welcomeMsg, strlen(welcomeMsg) + 1, 0);
+    //const char *welcomeMsg = "Welcome to the ChatServer";
+    //send(newClient, welcomeMsg, strlen(welcomeMsg) + 1, 0);
     cout << "Manager::pushClient: newClient = " << newClient << endl;
     Client tempClient;
     tempClient.clientId = newClient;
@@ -33,13 +33,14 @@ void Manager::popClient(int ClientId)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::popClient: ClientId = " << ClientId;
-    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
+    for (list<Client>::iterator it = mClients.begin(); it != mClients.end(); ++it) {
         if (it->clientId == ClientId) {
-            mClients.erase(it);
-            cout << " was erased";
+            it = mClients.erase(it);
+            cout << " was erased" << endl;
+            return;
         }
     }
-    cout << endl;
+    //cout << "43"<< endl;
 }
 
 //------------------------------------------------------------------------------------------
@@ -49,6 +50,7 @@ bool Manager::pushMail(int client)
     Mail tempMail;
     int bytesRecv = static_cast<int>( recv(client, &tempMail, sizeof(Mail), 0) );
     if (bytesRecv <= 0) {
+        cout << "Manager::pushMail: bytesRecv <= 0" << endl;
         //Drop the client
         return false;
     } else {
@@ -100,7 +102,10 @@ void Manager::processMailType(Mail& mail)
         processMailMessage(mail);
         break;
     case COMMAND:
-        processMailCommand(mail);
+
+        break;
+    case CLIENT_LOGIN:
+        processMailClientLogin(mail);
         break;
     default:
         cout << "ERROR: Manager::processMailType: mail.typeMail = "<< mail.typeMail << endl;
@@ -112,7 +117,7 @@ void Manager::processMailMessage(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
-        if (it->clientId != mail.clientId /*&& it->clientName != NULL*/) {
+        if (it->clientId != mail.clientId && it->clientName[0] != 0) {
             cout <<"Manager::processMailMessage: id = " << it->clientId <<"; data: " << mail.data << flush;
             send(it->clientId, &mail, sizeof (Mail), 0);
         }
@@ -120,20 +125,28 @@ void Manager::processMailMessage(Mail& mail)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailCommand(Mail& mail)
+void Manager::processMailClientLogin(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     if (checkNewClientName(mail)) {
         for (auto it = mClients.begin(); it != mClients.end(); ++it) {
             if (it->clientId == mail.clientId) {
                 strncpy(it->clientName, mail.data, sizeof (mail.data));
-                cout << "Manager::processMailCommand:"
+                Mail tempMail;
+                tempMail.typeMail = CLIENT_LOGIN;
+                strcpy(tempMail.data, it->clientName);
+                send(it->clientId, &tempMail, sizeof (Mail),0);
+                cout << "Manager::processMailClientLogin:"
                      << " ClientId: " << it->clientId
                      << " ClientName: " << it->clientName << endl;
             }
         }
     } else {
-        cout << "ERROR: Manager::processMailCommand: mail.clientId(" << mail.clientId << ") was found" << endl;
+        Mail tempMail;
+        tempMail.typeMail = CLIENT_LOGIN;
+        memset(tempMail.data, 0 , sizeof (tempMail.data));
+        send(mail.clientId, &tempMail, sizeof (Mail),0);
+        cout << "ERROR: Manager::processMailClientLogin: mail.clientId(" << mail.clientId << ") was found" << endl;
     }
 }
 
