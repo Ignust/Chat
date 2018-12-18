@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <cstring>
+#include<stdio.h>//snprintf();
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -40,7 +41,6 @@ void Manager::popClient(int ClientId)
             return;
         }
     }
-    //cout << "43"<< endl;
 }
 
 //------------------------------------------------------------------------------------------
@@ -81,15 +81,11 @@ int Manager::getAmountOfClient() const
 int Manager::getClient(int number)
 //------------------------------------------------------------------------------------------
 {
-    //cout << "getClient()" << endl;
     list<Client>::iterator it = mClients.begin();
-    //cout << "it = " << *it << endl;
     while (number != 0) {
         it++;
         number--;
-        //cout << "it = " << *it << endl;
     }
-
     return it->clientId;
 }
 
@@ -102,10 +98,13 @@ void Manager::processMailType(Mail& mail)
         processMailMessage(mail);
         break;
     case COMMAND:
-
+        //
         break;
     case CLIENT_LOGIN:
         processMailClientLogin(mail);
+        break;
+    case DISCONNECT_SERVER:
+        processMailDisconnectServer(mail);
         break;
     default:
         cout << "ERROR: Manager::processMailType: mail.typeMail = "<< mail.typeMail << endl;
@@ -116,10 +115,15 @@ void Manager::processMailType(Mail& mail)
 void Manager::processMailMessage(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
+
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
         if (it->clientId != mail.clientId && it->clientName[0] != 0) {
-            cout <<"Manager::processMailMessage: id = " << it->clientId <<"; data: " << mail.data << flush;
-            send(it->clientId, &mail, sizeof (Mail), 0);
+            Mail tempMail;
+            snprintf (tempMail.data,sizeof (tempMail.data), "[ %s ]: %s", it->clientName
+                      , mail.data);
+            cout <<"Manager::processMailMessage: id = " << it->clientId <<"; data: "
+                << mail.data << flush;
+            send(it->clientId, &tempMail, sizeof (Mail), 0);
         }
     }
 }
@@ -146,8 +150,16 @@ void Manager::processMailClientLogin(Mail& mail)
         tempMail.typeMail = CLIENT_LOGIN;
         memset(tempMail.data, 0 , sizeof (tempMail.data));
         send(mail.clientId, &tempMail, sizeof (Mail),0);
-        cout << "ERROR: Manager::processMailClientLogin: mail.clientId(" << mail.clientId << ") was found" << endl;
+        cout << "ERROR: Manager::processMailClientLogin: mail.clientId(" << mail.clientId
+             << ") was found" << endl;
     }
+}
+
+//------------------------------------------------------------------------------------------
+void Manager::processMailDisconnectServer(Mail& mail)
+//------------------------------------------------------------------------------------------
+{
+    cout << "Manager::processMailDisconnectServer" << endl;
 }
 
 //------------------------------------------------------------------------------------------

@@ -6,6 +6,7 @@ enum MAIL_TYPE
     MESSAGE
     , COMMAND
     , CLIENT_LOGIN
+    , DISCONNECT_SERVER
     , LAST_TYPE
 };
 

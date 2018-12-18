@@ -18,7 +18,12 @@ public:
 
 private:
     bool initClient();
-    void sendMessenger();
+    void checkKeyboardInput();
+    void sendMail(Mail& );
+    bool checkInputCommand(Mail&);
+    void processingCommandHelp();
+    void processingCommandDisconnectServer();
+    void processingInputCommand(Mail&);
     void checkMessenger();
     char* getmClientName(char *);
     void sendClientName(char *);
