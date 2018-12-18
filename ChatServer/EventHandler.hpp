@@ -6,12 +6,15 @@
 #include "Server.hpp"
 #include "Manager.hpp"
 
+class Manager;
+
 class EventHandler
 {
 public:
     EventHandler();
 
     void start[[noreturn]]();
+    void disconnectServer();
 
 private:
     void subscribeClient();

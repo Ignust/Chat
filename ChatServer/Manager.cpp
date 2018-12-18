@@ -7,14 +7,18 @@ using std::cout;
 using std::endl;
 using std::flush;
 
+
 #include "Manager.hpp"
+#include"EventHandler.hpp"
 
 //------------------------------------------------------------------------------------------
-Manager::Manager()
+Manager::Manager(EventHandler& eventHandler)
     : mClients()
     , mMails()
+    , mEvHndlr(eventHandler)
 //------------------------------------------------------------------------------------------
 {
+
 }
 
 //------------------------------------------------------------------------------------------
@@ -160,6 +164,7 @@ void Manager::processMailDisconnectServer(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::processMailDisconnectServer" << endl;
+    mEvHndlr.disconnectServer();
 }
 
 //------------------------------------------------------------------------------------------

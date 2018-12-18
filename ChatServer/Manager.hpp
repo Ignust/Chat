@@ -8,11 +8,13 @@ using std::list;
 
 #include "ClientTypes.hpp"
 #include "MailTypes.hpp"
+//#include"EventHandler.hpp"
+class EventHandler;
 
 class Manager
 {
 public:
-    Manager();
+    Manager(EventHandler&);
 
     void pushClient(int);
     void popClient(int);
@@ -31,6 +33,7 @@ private:
 private:
     list<Client> mClients;
     queue<Mail> mMails;
+    EventHandler& mEvHndlr;
 };
 
 #endif // MANAGER_HPP

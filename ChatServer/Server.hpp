@@ -8,6 +8,7 @@ public:
     void disconectClient(int);
     int listenClients();
     int getServer() const;
+    void closeServer();
 
 private:
     Server();

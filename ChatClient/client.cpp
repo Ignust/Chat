@@ -110,7 +110,7 @@ void Client::processingInputCommand(Mail& mail)
         processingCommandHelp();
         return;
     }
-    if (0 == strcmp ("/disconnect server\n", mail.data) ) {
+    if (0 == strcmp ("/ds\n", mail.data) ) {
         processingCommandDisconnectServer();
         return;
     }
@@ -122,7 +122,11 @@ void Client::processingInputCommand(Mail& mail)
 void Client::processingCommandHelp()
 //-----------------------------------------------------------------------------
 {
-    cout << "Client::processingCommandHelp" << endl;
+    cout << "----------CommandHelp-------------" << endl;
+
+    cout << "/ds - disconnect server" << endl;
+
+    cout << "----------------------------------" << endl;
 }
 
 //-----------------------------------------------------------------------------

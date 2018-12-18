@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 EventHandler::EventHandler()
     : mServer(Server::initServer())
-    , mManager()
+    , mManager(*this)
     , mReadset()
 //-----------------------------------------------------------------------------
 {
@@ -23,6 +23,15 @@ void EventHandler::start[[noreturn]]()
         checkNewMails();
         mManager.processMails();
     }
+}
+
+//-----------------------------------------------------------------------------
+void EventHandler::disconnectServer()
+//-----------------------------------------------------------------------------
+{
+    std::cout << "EventHandler::disconnectServer" << std::endl;
+    mServer.closeServer();
+    Server::initServer();
 }
 
 //-----------------------------------------------------------------------------
