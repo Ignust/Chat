@@ -20,9 +20,12 @@ private:
     bool initClient();
     void checkKeyboardInput();
     void sendMail(Mail& );
+
     bool checkInputCommand(Mail&);
     void processingCommandHelp();
     void processingCommandDisconnectServer();
+    void processingCommandDisconnectClient();
+
     void processingInputCommand(Mail&);
     void checkMessenger();
     char* getmClientName(char *);

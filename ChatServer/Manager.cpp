@@ -94,6 +94,13 @@ int Manager::getClient(int number)
 }
 
 //------------------------------------------------------------------------------------------
+void Manager::sendMail(Mail& meil, int clietn)
+//------------------------------------------------------------------------------------------
+{
+    send(clietn, &meil, sizeof (Mail), 0);
+}
+
+//------------------------------------------------------------------------------------------
 void Manager::processMailType(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
@@ -110,6 +117,9 @@ void Manager::processMailType(Mail& mail)
     case DISCONNECT_SERVER:
         processMailDisconnectServer(mail);
         break;
+    case DISCONNECT_CLIENT:
+        processMailDisconnectClient(mail);
+        break;
     default:
         cout << "ERROR: Manager::processMailType: mail.typeMail = "<< mail.typeMail << endl;
     }
@@ -119,15 +129,17 @@ void Manager::processMailType(Mail& mail)
 void Manager::processMailMessage(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
-
+    char* clientNameOfMail = getClietName(mail.clientId);
+    clientNameOfMail = getClietName(mail.clientId);
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
         if (it->clientId != mail.clientId && it->clientName[0] != 0) {
             Mail tempMail;
-            snprintf (tempMail.data,sizeof (tempMail.data), "[ %s ]: %s", it->clientName
+            tempMail.typeMail = MESSAGE;
+            snprintf (tempMail.data,sizeof (tempMail.data), "[ %s ]: %s", clientNameOfMail
                       , mail.data);
             cout <<"Manager::processMailMessage: id = " << it->clientId <<"; data: "
                 << mail.data << flush;
-            send(it->clientId, &tempMail, sizeof (Mail), 0);
+            sendMail(tempMail, it->clientId);
         }
     }
 }
@@ -164,7 +176,25 @@ void Manager::processMailDisconnectServer(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::processMailDisconnectServer" << endl;
-    mEvHndlr.disconnectServer();
+    mEvHndlr.responseDisconnectServer();
+}
+
+//------------------------------------------------------------------------------------------
+void Manager::processMailDisconnectClient(Mail& mail)
+//------------------------------------------------------------------------------------------
+{
+    cout << "Manager::processMailDisconnectClient" << endl;
+    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
+        if (0 == strcmp(it->clientName, mail.data)) {
+            mEvHndlr.responseDisconnectClient(it->clientId);
+            return;
+        }
+    }
+    Mail tempMail;
+    tempMail.typeMail = MESSAGE;
+    snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: clietn %s not found\n"
+              , mail.data);
+    sendMail(tempMail, mail.clientId);
 }
 
 //------------------------------------------------------------------------------------------
@@ -179,3 +209,15 @@ bool Manager::checkNewClientName(Mail& mail)
     return true;
 }
 
+//------------------------------------------------------------------------------------------
+char* Manager::getClietName(int client)
+//------------------------------------------------------------------------------------------
+{
+    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
+        if (it->clientId == client) {
+            return it->clientName;
+        }
+    }
+    cout << "ERORR:Manager::getClietName" << endl;
+    return nullptr;
+}

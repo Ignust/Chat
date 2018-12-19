@@ -14,7 +14,8 @@ public:
     EventHandler();
 
     void start[[noreturn]]();
-    void disconnectServer();
+    void responseDisconnectServer();
+    void responseDisconnectClient(int);
 
 private:
     void subscribeClient();

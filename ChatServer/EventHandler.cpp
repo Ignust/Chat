@@ -26,12 +26,19 @@ void EventHandler::start[[noreturn]]()
 }
 
 //-----------------------------------------------------------------------------
-void EventHandler::disconnectServer()
+void EventHandler::responseDisconnectServer()
 //-----------------------------------------------------------------------------
 {
-    std::cout << "EventHandler::disconnectServer" << std::endl;
+    std::cout << "EventHandler::responseDisconnectServer" << std::endl;
     mServer.closeServer();
-    Server::initServer();
+}
+
+//-----------------------------------------------------------------------------
+void EventHandler::responseDisconnectClient(int client)
+//-----------------------------------------------------------------------------
+{
+    std::cout << "EventHandler::responseDisconnectClient" << std::endl;
+    unsubscribeClient(client);
 }
 
 //-----------------------------------------------------------------------------

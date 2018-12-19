@@ -24,11 +24,14 @@ public:
     int getClient(int);
 
 private:
+    void sendMail(Mail&, int);
     void processMailType(Mail&);
     void processMailMessage(Mail&);
     void processMailClientLogin(Mail&);
     void processMailDisconnectServer(Mail&);
+    void processMailDisconnectClient(Mail&);
     bool checkNewClientName(Mail&);
+    char* getClietName(int);
 
 private:
     list<Client> mClients;

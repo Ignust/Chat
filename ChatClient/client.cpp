@@ -114,6 +114,10 @@ void Client::processingInputCommand(Mail& mail)
         processingCommandDisconnectServer();
         return;
     }
+    if (0 == strcmp ("/dc\n", mail.data) ) {
+        processingCommandDisconnectClient();
+        return;
+    }
 
     cout <<"Wrong command, enter /help for to get more information about commands" << endl;
 }
@@ -125,6 +129,7 @@ void Client::processingCommandHelp()
     cout << "----------CommandHelp-------------" << endl;
 
     cout << "/ds - disconnect server" << endl;
+    cout << "/dc - disconnect client" << endl;
 
     cout << "----------------------------------" << endl;
 }
@@ -138,6 +143,55 @@ void Client::processingCommandDisconnectServer()
     tempMail.typeMail = DISCONNECT_SERVER;
     sendMail(tempMail);
 }
+
+//-----------------------------------------------------------------------------
+void Client::processingCommandDisconnectClient()
+//-----------------------------------------------------------------------------
+{
+    /*cout << "Client::processingCommandDisconnectServer" << endl;
+    Mail tempMail;
+    char* buff = new char [ARRAY_SIZE];
+    buff = getmClientName(buff);
+    tempMail.typeMail = DISCONNECT_CLIENT;
+    strcpy(tempMail.data, buff);
+    sendMail(tempMail);
+    delete [] buff;
+    */
+    cout << "Enter name" << endl;
+
+    int epollFd = epoll_create1(0);
+
+    epoll_event eventFd;
+    epoll_event events[1];
+    eventFd.events = EPOLLIN;
+    eventFd.data.fd = 0;
+    epoll_ctl(epollFd, EPOLL_CTL_ADD, 0, &eventFd);
+    bool waitingForInput = true;
+    while (waitingForInput) {
+        int amountEvents = epoll_wait(epollFd, events, 1, 500);
+        for (int a = 0; a < amountEvents; ++a) {
+            Mail tempMail;
+            memset(tempMail.data, 0, sizeof(tempMail.data));
+            read(events[a].data.fd, tempMail.data,sizeof(tempMail.data));
+            if (tempMail.data[0]!=0) {
+                tempMail.typeMail = DISCONNECT_CLIENT;
+
+                for (int i = 0; i < 1024;++i) {
+                    if (tempMail.data[i] == '\n') {
+                        tempMail.data[i] = 0;
+                        break;
+                    }
+                }
+
+                sendMail(tempMail);
+                waitingForInput = false;
+                cout << "Client::processingCommandDisconnectClient:sendMail" << endl;
+            }
+        }
+        checkMessenger();
+    }
+
+    }
 
 //-----------------------------------------------------------------------------
 void Client::checkMessenger()
@@ -161,7 +215,7 @@ void Client::checkMessenger()
 }
 
 //-----------------------------------------------------------------------------
-char* Client::getmClientName( char* name)
+char* Client::getmClientName(char* name)
 //-----------------------------------------------------------------------------
 {
     cout << "Enter Name" << endl;
@@ -190,6 +244,7 @@ bool Client::createSocket()
         return false;
     } else {
         cout << "Client::createSocket: mSocket = "<< mSocket <<" was created" << endl;
+        return true;
     }
     //fcntl(mSocket, F_SETFL, O_NONBLOCK);
 }
