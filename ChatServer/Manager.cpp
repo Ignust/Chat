@@ -25,8 +25,6 @@ Manager::Manager(EventHandler& eventHandler)
 void Manager::pushClient(int newClient)
 //------------------------------------------------------------------------------------------
 {
-    //const char *welcomeMsg = "Welcome to the ChatServer";
-    //send(newClient, welcomeMsg, strlen(welcomeMsg) + 1, 0);
     cout << "Manager::pushClient: newClient = " << newClient << endl;
     Client tempClient;
     tempClient.clientId = newClient;
@@ -183,15 +181,18 @@ void Manager::processMailDisconnectServer(Mail& mail)
 void Manager::processMailDisconnectClient(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
+    Mail tempMail;
+    tempMail.typeMail = MESSAGE;
     cout << "Manager::processMailDisconnectClient" << endl;
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
         if (0 == strcmp(it->clientName, mail.data)) {
+            snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: %s disconnected you from the server\n"
+                      , getClietName(mail.clientId));
+            sendMail(tempMail, it->clientId);
             mEvHndlr.responseDisconnectClient(it->clientId);
             return;
         }
     }
-    Mail tempMail;
-    tempMail.typeMail = MESSAGE;
     snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: clietn %s not found\n"
               , mail.data);
     sendMail(tempMail, mail.clientId);

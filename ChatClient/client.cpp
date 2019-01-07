@@ -138,7 +138,7 @@ void Client::processingCommandHelp()
 void Client::processingCommandDisconnectServer()
 //-----------------------------------------------------------------------------
 {
-    cout << "Client::processingCommandDisconnectServer" << endl;
+    //cout << "Client::processingCommandDisconnectServer" << endl;
     Mail tempMail;
     tempMail.typeMail = DISCONNECT_SERVER;
     sendMail(tempMail);
@@ -175,17 +175,10 @@ void Client::processingCommandDisconnectClient()
             read(events[a].data.fd, tempMail.data,sizeof(tempMail.data));
             if (tempMail.data[0]!=0) {
                 tempMail.typeMail = DISCONNECT_CLIENT;
-
-                for (int i = 0; i < 1024;++i) {
-                    if (tempMail.data[i] == '\n') {
-                        tempMail.data[i] = 0;
-                        break;
-                    }
-                }
-
+                tempMail.data[strlen(tempMail.data)-1] = 0;
                 sendMail(tempMail);
                 waitingForInput = false;
-                cout << "Client::processingCommandDisconnectClient:sendMail" << endl;
+                //cout << "Client::processingCommandDisconnectClient:sendMail" << endl;
             }
         }
         checkMessenger();
@@ -199,15 +192,15 @@ void Client::checkMessenger()
 {
     int epollFd = epoll_create1(0);
 
-    epoll_event eventFd;
-    epoll_event events[AMOUNT_EVENTS];
+    epoll_event eventFd = {};
+    epoll_event events[AMOUNT_EVENTS] = {};
     eventFd.events = EPOLLIN;
     eventFd.data.fd = mSocket;
     epoll_ctl(epollFd, EPOLL_CTL_ADD, mSocket, &eventFd);
 
     int amountEvents = epoll_wait(epollFd, events, AMOUNT_EVENTS, 500);
     for (int i = 0; i < amountEvents; ++i) {
-        Mail tempMail;
+        Mail tempMail = {};
         if(0 <= read(events[i].data.fd, &tempMail, sizeof (Mail))){
             processMailType(tempMail);
         }
