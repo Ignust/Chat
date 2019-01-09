@@ -29,7 +29,8 @@ private:
     void processingInputCommand(Mail&);
     void checkMessenger();
     char* getmClientName(char *);
-    void sendClientName(char *);
+    void getClientPassword(char *);
+    void sendClientLogin(char *);
     bool createSocket();
     bool connectSocket();
     void processMailType(Mail&);

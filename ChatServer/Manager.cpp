@@ -16,6 +16,7 @@ Manager::Manager(EventHandler& eventHandler)
     : mClients()
     , mMails()
     , mEvHndlr(eventHandler)
+    , mDatabase()
 //------------------------------------------------------------------------------------------
 {
 
@@ -146,24 +147,31 @@ void Manager::processMailMessage(Mail& mail)
 void Manager::processMailClientLogin(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
-    if (checkNewClientName(mail)) {
+    char clientName[1024] = {};
+    char clientPassword[1024] = {};
+    parseClientLogin(clientName, clientPassword,mail);
+
+    if (checkNewClientName(clientName)) {
         for (auto it = mClients.begin(); it != mClients.end(); ++it) {
             if (it->clientId == mail.clientId) {
-                strncpy(it->clientName, mail.data, sizeof (mail.data));
+                strncpy(it->clientName, clientName, sizeof (clientName));
+                strncpy(it->ClientPassword, clientPassword, sizeof (clientPassword));
+                it->ClientLvl = 0;
                 Mail tempMail;
                 tempMail.typeMail = CLIENT_LOGIN;
                 strcpy(tempMail.data, it->clientName);
-                send(it->clientId, &tempMail, sizeof (Mail),0);
+                sendMail(tempMail,it->clientId);
                 cout << "Manager::processMailClientLogin:"
                      << " ClientId: " << it->clientId
                      << " ClientName: " << it->clientName << endl;
+                addClientToDatabase(clientName);
             }
         }
     } else {
         Mail tempMail;
         tempMail.typeMail = CLIENT_LOGIN;
         memset(tempMail.data, 0 , sizeof (tempMail.data));
-        send(mail.clientId, &tempMail, sizeof (Mail),0);
+        sendMail(tempMail, mail.clientId);
         cout << "ERROR: Manager::processMailClientLogin: mail.clientId(" << mail.clientId
              << ") was found" << endl;
     }
@@ -199,11 +207,11 @@ void Manager::processMailDisconnectClient(Mail& mail)
 }
 
 //------------------------------------------------------------------------------------------
-bool Manager::checkNewClientName(Mail& mail)
+bool Manager::checkNewClientName(char* clientName)
 //------------------------------------------------------------------------------------------
 {
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
-        if (0 == strcmp(it->clientName, mail.data) ) {
+        if (0 == strcmp(it->clientName, clientName) ) {
             return false;
         }
     }
@@ -222,3 +230,40 @@ char* Manager::getClietName(int client)
     cout << "ERORR:Manager::getClietName" << endl;
     return nullptr;
 }
+
+//------------------------------------------------------------------------------------------
+void Manager::addClientToDatabase( char* clientName)
+//------------------------------------------------------------------------------------------
+{
+    ofstream ofsDataBase = ofstream(FILE_NAME_FOR_DATABASE, std::ios::out | std::ios::app);
+    if (ofsDataBase.is_open()) {
+        ofsDataBase << clientName << "\n";
+    }
+}
+
+//------------------------------------------------------------------------------------------
+void Manager::parseClientLogin( char* clientName, char* clientPassword,Mail& mail)
+//------------------------------------------------------------------------------------------
+{
+    int clientNameLen = 0;
+    int clientPasswordLen = 0;
+
+    // Ищем пробел и длинну строк
+    char *space = strstr(mail.data, " ");
+    clientNameLen = space - mail.data;
+    clientPasswordLen = strlen(mail.data) - clientNameLen - 1;
+
+    // Копируем первое слово
+    strncpy(clientName, &mail.data[0], clientNameLen);
+    clientName[clientNameLen] = '\0';
+
+    // Копируем остальную строку
+    strncpy(clientPassword, &space[1], clientPasswordLen + 1);
+
+    cout << "Manager::parseClientLogin: clientName = " << clientName << " clientPassword = "
+         << clientPassword << endl;
+}
+
+
+
+

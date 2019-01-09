@@ -6,6 +6,7 @@
 #include<unistd.h>
 #include<fcntl.h>
 #include<cstring>
+#include<stdio.h>
 using namespace std;
 
 #include "Client.hpp"
@@ -43,7 +44,7 @@ bool Client::initClient()
 void Client::start[[noreturn]]()
 //-----------------------------------------------------------------------------
 {
-    sendClientName(getmClientName(mClientName));
+    sendClientLogin(getmClientName(mClientName));
     while (true) {
         checkMessenger();
         checkKeyboardInput();
@@ -100,6 +101,7 @@ bool Client::checkInputCommand(Mail& mail)
         return true;
     }
     return false;
+    //return (mail.data[0] == '/') ? true : false;
 }
 
 //-----------------------------------------------------------------------------
@@ -148,15 +150,6 @@ void Client::processingCommandDisconnectServer()
 void Client::processingCommandDisconnectClient()
 //-----------------------------------------------------------------------------
 {
-    /*cout << "Client::processingCommandDisconnectServer" << endl;
-    Mail tempMail;
-    char* buff = new char [ARRAY_SIZE];
-    buff = getmClientName(buff);
-    tempMail.typeMail = DISCONNECT_CLIENT;
-    strcpy(tempMail.data, buff);
-    sendMail(tempMail);
-    delete [] buff;
-    */
     cout << "Enter name" << endl;
 
     int epollFd = epoll_create1(0);
@@ -217,13 +210,26 @@ char* Client::getmClientName(char* name)
 }
 
 //-----------------------------------------------------------------------------
-void Client::sendClientName(char * name)
+void Client::getClientPassword(char* name)
 //-----------------------------------------------------------------------------
 {
+    cout << "Enter password" << endl;
+    cin >> name;
+}
+
+//-----------------------------------------------------------------------------
+void Client::sendClientLogin(char * name)
+//-----------------------------------------------------------------------------
+{
+    char clientPassword[ARRAY_SIZE] = {};
+    getClientPassword(clientPassword);
+    char clientLogin[ARRAY_SIZE * 2] = {};
+    snprintf(clientLogin, sizeof (clientLogin),"%s %s", name, clientPassword);
+
     Mail tempMail;
     tempMail.typeMail = CLIENT_LOGIN;
     memset(tempMail.data, 0 ,sizeof (tempMail.data));
-    strncpy(tempMail.data, name, sizeof (mClientName));
+    strncpy(tempMail.data, clientLogin, sizeof (mClientName));
     sendMail(tempMail);
 }
 
@@ -303,6 +309,6 @@ void Client::processMailClientLOgin(Mail& mail)
     } else{
         memset(mClientName, 0,sizeof(mClientName));
         cout << "Name not available"<< endl;
-        sendClientName(getmClientName(mClientName));
+        sendClientLogin(getmClientName(mClientName));
     }
 }
