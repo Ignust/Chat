@@ -16,7 +16,7 @@ Manager::Manager(EventHandler& eventHandler)
     : mClients()
     , mMails()
     , mEvHndlr(eventHandler)
-    , mDatabase()
+    , mDataBase()
 //------------------------------------------------------------------------------------------
 {
 
@@ -156,7 +156,7 @@ void Manager::processMailClientLogin(Mail& mail)
             if (it->clientId == mail.clientId) {
                 strncpy(it->clientName, clientName, sizeof (clientName));
                 strncpy(it->ClientPassword, clientPassword, sizeof (clientPassword));
-                it->ClientLvl = 0;
+                it->ClientLvl = '0';
                 Mail tempMail;
                 tempMail.typeMail = CLIENT_LOGIN;
                 strcpy(tempMail.data, it->clientName);
@@ -164,7 +164,7 @@ void Manager::processMailClientLogin(Mail& mail)
                 cout << "Manager::processMailClientLogin:"
                      << " ClientId: " << it->clientId
                      << " ClientName: " << it->clientName << endl;
-                addClientToDatabase(clientName);
+                addClientToDatabase(it->clientName, it->ClientPassword, it->ClientLvl);
             }
         }
     } else {
@@ -232,13 +232,13 @@ char* Manager::getClietName(int client)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::addClientToDatabase( char* clientName)
+void Manager::addClientToDatabase( char* clientName, char* clientPassword, char clientLvl)
 //------------------------------------------------------------------------------------------
 {
-    ofstream ofsDataBase = ofstream(FILE_NAME_FOR_DATABASE, std::ios::out | std::ios::app);
-    if (ofsDataBase.is_open()) {
-        ofsDataBase << clientName << "\n";
-    }
+    char tempClientData[1024] = {};
+    snprintf(tempClientData, sizeof(tempClientData),"%s %s %c", clientName, clientPassword
+             , clientLvl);
+    mDataBase.writeToDatabase(tempClientData);
 }
 
 //------------------------------------------------------------------------------------------

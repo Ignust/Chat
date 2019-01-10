@@ -7,11 +7,13 @@ SOURCES += \
         main.cpp \
     Server.cpp \
     Manager.cpp \
-    EventHandler.cpp
+    EventHandler.cpp \
+    DataBase.cpp
 
 HEADERS += \
     Server.hpp \
     Manager.hpp \
     MailTypes.hpp \
     EventHandler.hpp \
-    ClientTypes.hpp
+    ClientTypes.hpp \
+    DataBase.hpp
