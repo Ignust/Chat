@@ -18,6 +18,7 @@ public:
     Manager(EventHandler&);
 
     void pushClient(int);
+    void pushClientFromDatabase(char*);
     void popClient(int);
     bool pushMail(int);
     void processMails();
@@ -33,8 +34,10 @@ private:
     void processMailDisconnectClient(Mail&);
     bool checkNewClientName(char*);
     char* getClietName(int);
-    void addClientToDatabase(char*,char*,char);
+    void addClientToDatabase(const Client &);
     void parseClientLogin(char*, char*,Mail&);
+    void loadClientsFromTheDatabase();
+    void parseClientFromTheDatabase(Client&, char*);
 
 private:
     list<Client> mClients;

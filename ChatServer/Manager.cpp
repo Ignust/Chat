@@ -19,7 +19,7 @@ Manager::Manager(EventHandler& eventHandler)
     , mDataBase()
 //------------------------------------------------------------------------------------------
 {
-
+    //loadClientsFromTheDatabase();
 }
 
 //------------------------------------------------------------------------------------------
@@ -29,6 +29,16 @@ void Manager::pushClient(int newClient)
     cout << "Manager::pushClient: newClient = " << newClient << endl;
     Client tempClient;
     tempClient.clientId = newClient;
+    mClients.push_back(tempClient);
+}
+
+//------------------------------------------------------------------------------------------
+void Manager::pushClientFromDatabase( char* clientFromDatabase)
+//------------------------------------------------------------------------------------------
+{
+    Client tempClient;
+    parseClientFromTheDatabase(tempClient, clientFromDatabase);
+    tempClient.clientId = 1023;
     mClients.push_back(tempClient);
 }
 
@@ -129,7 +139,6 @@ void Manager::processMailMessage(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     char* clientNameOfMail = getClietName(mail.clientId);
-    clientNameOfMail = getClietName(mail.clientId);
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
         if (it->clientId != mail.clientId && it->clientName[0] != 0) {
             Mail tempMail;
@@ -164,7 +173,7 @@ void Manager::processMailClientLogin(Mail& mail)
                 cout << "Manager::processMailClientLogin:"
                      << " ClientId: " << it->clientId
                      << " ClientName: " << it->clientName << endl;
-                addClientToDatabase(it->clientName, it->ClientPassword, it->ClientLvl);
+                addClientToDatabase(*(it));
             }
         }
     } else {
@@ -232,12 +241,12 @@ char* Manager::getClietName(int client)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::addClientToDatabase( char* clientName, char* clientPassword, char clientLvl)
+void Manager::addClientToDatabase(const Client& client)
 //------------------------------------------------------------------------------------------
 {
     char tempClientData[1024] = {};
-    snprintf(tempClientData, sizeof(tempClientData),"%s %s %c", clientName, clientPassword
-             , clientLvl);
+    snprintf(tempClientData, sizeof(tempClientData),"%s %s %c", client.clientName, client.ClientPassword
+             , client.ClientLvl);
     mDataBase.writeToDatabase(tempClientData);
 }
 
@@ -264,6 +273,43 @@ void Manager::parseClientLogin( char* clientName, char* clientPassword,Mail& mai
          << clientPassword << endl;
 }
 
+//------------------------------------------------------------------------------------------
+void Manager::loadClientsFromTheDatabase()
+//------------------------------------------------------------------------------------------
+{
+    cout << "Manager::loadClientsFromTheDatabase()" << endl;
+    char tempClient[1024] = {};
+    while(mDataBase.getClient(tempClient)) {
+        pushClientFromDatabase(tempClient);
+    }
+}
+
+//------------------------------------------------------------------------------------------
+void Manager::parseClientFromTheDatabase(Client& client, char* data)
+//------------------------------------------------------------------------------------------
+{
+    int clientNameLen = 0;
+    int clientPasswordLen = 0;
+
+    // Ищем пробел и длинну строк
+    char *space = strstr(data, " ");
+    clientNameLen = space - data;
+    clientPasswordLen = strlen(data) - clientNameLen - 1;
+
+    // Копируем первое слово
+    strncpy(client.clientName, &data[0], clientNameLen);
+    client.clientName[clientNameLen] = '\0';
+
+    // Копируем остальную строку
+    strncpy(client.ClientPassword, &space[1], clientPasswordLen -2);
+
+    char *space2 = strstr(&space[1], " ");
+    client.ClientLvl = *(space2+1);
+
+    cout << "Manager::parseClientFromTheDatabase: clientName = " << client.clientName << " clientPassword = "
+         << client.ClientPassword << " clientLvl = "<< client.ClientLvl << endl;
+
+}
 
 
 

@@ -14,9 +14,11 @@ public:
     DataBase();
     ~DataBase();
     void writeToDatabase(char*);
+    bool getClient(char*);
 
 private:
-    fstream mfstream;
+    fstream mFstream;
+    long long readPosition;
 
 
 };
