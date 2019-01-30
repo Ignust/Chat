@@ -9,6 +9,7 @@ using std::list;
 #include "ClientTypes.hpp"
 #include "MailTypes.hpp"
 #include "DataBase.hpp"
+#include"Tools.hpp"
 //#include"EventHandler.hpp"
 class EventHandler;
 
@@ -18,7 +19,6 @@ public:
     Manager(EventHandler&);
 
     void pushClient(int);
-    void pushClientFromDatabase(char*);
     void popClient(int);
     bool pushMail(int);
     void processMails();
@@ -30,9 +30,16 @@ private:
     void processMailType(Mail&);
     void processMailMessage(Mail&);
     void processMailClientLogin(Mail&);
+    void processInvalidPassword(Mail&);
+    void processClientFound(Mail&, char*);
+    int getClientId(char*);
+    bool checkClientNameInDatabase(char*, char*);
+    void addClientToList(Mail&, char*, char*);
     void processMailDisconnectServer(Mail&);
     void processMailDisconnectClient(Mail&);
+    void DisconnectClient(int);
     bool checkNewClientName(char*);
+    void addClientToListFromDatabase(Mail, char*);
     char* getClietName(int);
     void addClientToDatabase(const Client &);
     void parseClientLogin(char*, char*,Mail&);

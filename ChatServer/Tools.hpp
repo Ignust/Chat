@@ -1,0 +1,12 @@
+#ifndef TOOLS_HPP
+#define TOOLS_HPP
+
+enum DATA_BASE_RETURN_TYPES
+{
+    INVALID_NAME
+    , INVALID_PASSWORD
+    , CLIENT_FOUND
+    , OTHER
+};
+
+#endif // TOOLS_HPP

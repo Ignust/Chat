@@ -304,6 +304,14 @@ void Client::processMailCommand(Mail& mail)
 void Client::processMailClientLOgin(Mail& mail)
 //-----------------------------------------------------------------------------
 {
+    if (0 == strcmp(mail.data, mClientName)) {
+        cout << "Log in to the server with a nickname: " << mClientName << endl;
+    } else{
+        memset(mClientName, 0,sizeof(mClientName));
+        cout << mail.data << endl;
+        sendClientLogin(getmClientName(mClientName));
+    }
+    /*
     if(mail.data[0] != 0){
         cout << "Log in to the server with a nickname: " << mClientName << endl;
     } else{
@@ -311,4 +319,5 @@ void Client::processMailClientLOgin(Mail& mail)
         cout << "Name not available"<< endl;
         sendClientLogin(getmClientName(mClientName));
     }
+    */
 }

@@ -18,6 +18,7 @@ void EventHandler::start[[noreturn]]()
 //-----------------------------------------------------------------------------
 {
     while (1) {
+        //std::cout << "EventHandler::start" << std::endl;
         initReadSet();
         checkNewClient();
         checkNewMails();

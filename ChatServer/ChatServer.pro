@@ -16,4 +16,5 @@ HEADERS += \
     MailTypes.hpp \
     EventHandler.hpp \
     ClientTypes.hpp \
-    DataBase.hpp
+    DataBase.hpp \
+    Tools.hpp

@@ -33,13 +33,18 @@ void Manager::pushClient(int newClient)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::pushClientFromDatabase( char* clientFromDatabase)
+void Manager::addClientToListFromDatabase(Mail mail, char* clientFromDatabase)
 //------------------------------------------------------------------------------------------
 {
-    Client tempClient;
-    parseClientFromTheDatabase(tempClient, clientFromDatabase);
-    tempClient.clientId = 1023;
-    mClients.push_back(tempClient);
+    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
+        if (it->clientId == mail.clientId) {
+            parseClientFromTheDatabase(*it, clientFromDatabase);
+            Mail tempMail;
+            tempMail.typeMail = CLIENT_LOGIN;
+            strcpy(tempMail.data,it->clientName);
+            sendMail(tempMail,it->clientId);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------------------
@@ -106,6 +111,7 @@ int Manager::getClient(int number)
 void Manager::sendMail(Mail& meil, int clietn)
 //------------------------------------------------------------------------------------------
 {
+    cout << "Manager::sendMail: to -> " << clietn << endl;
     send(clietn, &meil, sizeof (Mail), 0);
 }
 
@@ -140,7 +146,9 @@ void Manager::processMailMessage(Mail& mail)
 {
     char* clientNameOfMail = getClietName(mail.clientId);
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
-        if (it->clientId != mail.clientId && it->clientName[0] != 0) {
+        if (it->clientId != mail.clientId
+                && it->clientName[0] != 0
+                && it->clientId !=0) {
             Mail tempMail;
             tempMail.typeMail = MESSAGE;
             snprintf (tempMail.data,sizeof (tempMail.data), "[ %s ]: %s", clientNameOfMail
@@ -160,21 +168,31 @@ void Manager::processMailClientLogin(Mail& mail)
     char clientPassword[1024] = {};
     parseClientLogin(clientName, clientPassword,mail);
 
+    switch (mDataBase.checkClientInData(clientName,clientPassword)) {
+    case INVALID_NAME:
+        cout << "Manager::processMailClientLogin:processInvalidName()" << endl;
+        //processInvalidName();
+        addClientToList(mail, clientName, clientPassword);
+        break;
+    case INVALID_PASSWORD:
+        cout << "Manager::processMailClientLogin:processInvalidPassword()" << endl;
+        processInvalidPassword(mail);
+        break;
+    case CLIENT_FOUND:
+        cout << "Manager::processMailClientLogin:processClientFound()" << endl;
+        processClientFound(mail, clientName);
+        break;
+    case OTHER:
+        cout << "Manager::processMailClientLogin:OTHER()" << endl;
+        break;
+    default:
+        cout << "Error Manager::processMailClientLogin: switch()" << endl;
+        break;
+    }
+    /*
     if (checkNewClientName(clientName)) {
-        for (auto it = mClients.begin(); it != mClients.end(); ++it) {
-            if (it->clientId == mail.clientId) {
-                strncpy(it->clientName, clientName, sizeof (clientName));
-                strncpy(it->ClientPassword, clientPassword, sizeof (clientPassword));
-                it->ClientLvl = '0';
-                Mail tempMail;
-                tempMail.typeMail = CLIENT_LOGIN;
-                strcpy(tempMail.data, it->clientName);
-                sendMail(tempMail,it->clientId);
-                cout << "Manager::processMailClientLogin:"
-                     << " ClientId: " << it->clientId
-                     << " ClientName: " << it->clientName << endl;
-                addClientToDatabase(*(it));
-            }
+        if(checkClientNameInDatabase(clientName, clientPassword)) {
+            addClientToList(mail, clientName, clientPassword);
         }
     } else {
         Mail tempMail;
@@ -184,6 +202,86 @@ void Manager::processMailClientLogin(Mail& mail)
         cout << "ERROR: Manager::processMailClientLogin: mail.clientId(" << mail.clientId
              << ") was found" << endl;
     }
+    */
+}
+
+//------------------------------------------------------------------------------------------
+void Manager::processInvalidPassword(Mail& mail)
+//------------------------------------------------------------------------------------------
+{
+    Mail tempMail;
+    tempMail.typeMail = CLIENT_LOGIN;
+    snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: invalid password");
+    sendMail(tempMail, mail.clientId);
+}
+
+//------------------------------------------------------------------------------------------
+void Manager::processClientFound(Mail& mail, char* clientName)
+//------------------------------------------------------------------------------------------
+{
+    int clientId = getClientId(clientName);
+    if (clientId > 0) {
+        DisconnectClient(clientId);
+    }
+
+    char tempClientforDataBase[1024] = {};
+    if (mDataBase.getClientByName(tempClientforDataBase,clientName)){
+        addClientToListFromDatabase(mail, tempClientforDataBase);
+    }
+
+}
+
+//------------------------------------------------------------------------------------------
+int Manager::getClientId(char* clientName)
+//------------------------------------------------------------------------------------------
+{
+    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
+        if (0 == strcmp(it->clientName, clientName) ) {
+            return it->clientId;
+        }
+    }
+    return -1;
+}
+
+bool Manager::checkClientNameInDatabase(char* clientName, char* clientPassword)
+//------------------------------------------------------------------------------------------
+{
+    cout << "Manager::checkClientNameInDatabase()" << endl;
+    Client tempClient;
+    char ClientFromDatabase[1024] = {};
+    while(mDataBase.getClient(ClientFromDatabase)) {
+        parseClientFromTheDatabase(tempClient, ClientFromDatabase);
+        if (0 == strcmp(clientName, tempClient.clientName) ) {
+            if (0 == strcmp(clientPassword, tempClient.ClientPassword) ) {
+
+            }
+            return false;
+        }
+    }
+    return true;
+}
+
+//------------------------------------------------------------------------------------------
+void Manager::addClientToList(Mail& mail, char* clientName, char* clientPassword)
+//------------------------------------------------------------------------------------------
+{
+    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
+
+        if (it->clientId == mail.clientId) {
+            strncpy(it->clientName, clientName, sizeof (char[1024]));
+            strncpy(it->ClientPassword, clientPassword, sizeof (char[1024]));
+            it->ClientLvl = '0';
+            Mail tempMail;
+            tempMail.typeMail = CLIENT_LOGIN;
+            strcpy(tempMail.data,clientName);
+            sendMail(tempMail,it->clientId);
+            cout << "Manager::addClientToList:"
+                 << " ClientId: " << it->clientId
+                 << " ClientName: " << it->clientName << endl;
+            addClientToDatabase(*it);
+        }
+
+        }
 }
 
 //------------------------------------------------------------------------------------------
@@ -213,6 +311,19 @@ void Manager::processMailDisconnectClient(Mail& mail)
     snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: clietn %s not found\n"
               , mail.data);
     sendMail(tempMail, mail.clientId);
+}
+
+//------------------------------------------------------------------------------------------
+void Manager::DisconnectClient(int clientId)
+//------------------------------------------------------------------------------------------
+{
+    Mail tempMail;
+    tempMail.typeMail = MESSAGE;
+    cout << "Manager::DisconnectClient: " << clientId << endl;
+    snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: you was disconnected from the server\n"
+              );
+    sendMail(tempMail, clientId);
+    mEvHndlr.responseDisconnectClient(clientId);
 }
 
 //------------------------------------------------------------------------------------------
@@ -277,11 +388,14 @@ void Manager::parseClientLogin( char* clientName, char* clientPassword,Mail& mai
 void Manager::loadClientsFromTheDatabase()
 //------------------------------------------------------------------------------------------
 {
+    cout << "Error Manager::loadClientsFromTheDatabase()" << endl;
+    /*
     cout << "Manager::loadClientsFromTheDatabase()" << endl;
     char tempClient[1024] = {};
     while(mDataBase.getClient(tempClient)) {
         pushClientFromDatabase(tempClient);
     }
+    */
 }
 
 //------------------------------------------------------------------------------------------
