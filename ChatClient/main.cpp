@@ -7,7 +7,7 @@
 int main()
 {
     Client chatClient;
-    chatClient.start();
+    //chatClient.start();
 
     return 0;
 }

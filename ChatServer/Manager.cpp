@@ -189,20 +189,7 @@ void Manager::processMailClientLogin(Mail& mail)
         cout << "Error Manager::processMailClientLogin: switch()" << endl;
         break;
     }
-    /*
-    if (checkNewClientName(clientName)) {
-        if(checkClientNameInDatabase(clientName, clientPassword)) {
-            addClientToList(mail, clientName, clientPassword);
-        }
-    } else {
-        Mail tempMail;
-        tempMail.typeMail = CLIENT_LOGIN;
-        memset(tempMail.data, 0 , sizeof (tempMail.data));
-        sendMail(tempMail, mail.clientId);
-        cout << "ERROR: Manager::processMailClientLogin: mail.clientId(" << mail.clientId
-             << ") was found" << endl;
-    }
-    */
+
 }
 
 //------------------------------------------------------------------------------------------
@@ -297,10 +284,10 @@ void Manager::processMailDisconnectClient(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     Mail tempMail;
-    tempMail.typeMail = MESSAGE;
     cout << "Manager::processMailDisconnectClient" << endl;
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
         if (0 == strcmp(it->clientName, mail.data)) {
+            tempMail.typeMail = DISCONNECT_CLIENT;
             snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: %s disconnected you from the server\n"
                       , getClietName(mail.clientId));
             sendMail(tempMail, it->clientId);
@@ -308,6 +295,7 @@ void Manager::processMailDisconnectClient(Mail& mail)
             return;
         }
     }
+    tempMail.typeMail = MESSAGE;
     snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: clietn %s not found\n"
               , mail.data);
     sendMail(tempMail, mail.clientId);
@@ -318,7 +306,7 @@ void Manager::DisconnectClient(int clientId)
 //------------------------------------------------------------------------------------------
 {
     Mail tempMail;
-    tempMail.typeMail = MESSAGE;
+    tempMail.typeMail = DISCONNECT_CLIENT;
     cout << "Manager::DisconnectClient: " << clientId << endl;
     snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: you was disconnected from the server\n"
               );

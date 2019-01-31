@@ -18,13 +18,15 @@ Client::Client()
     , mSockAddr()
     , mSet()
     , mMail()
+    , mOutput(false)
 {
     memset(mClientName, 0, sizeof (mClientName));
     if (initClient()) {
-        cout << "Client::Client: Client init" << endl;
+        //cout << "Client::Client: Client init" << endl;
     } else {
         cout << "Client::Client: Client was not init" << endl;
     }
+    start();
 }
 
 //-----------------------------------------------------------------------------
@@ -45,6 +47,7 @@ void Client::start[[noreturn]]()
 //-----------------------------------------------------------------------------
 {
     sendClientLogin(getmClientName(mClientName));
+
     while (true) {
         checkMessenger();
         checkKeyboardInput();
@@ -242,7 +245,7 @@ bool Client::createSocket()
         cout << "ERORR: Client::createSocket: mSocket = "<< mSocket << endl;
         return false;
     } else {
-        cout << "Client::createSocket: mSocket = "<< mSocket <<" was created" << endl;
+        //cout << "Client::createSocket: mSocket = "<< mSocket <<" was created" << endl;
         return true;
     }
     //fcntl(mSocket, F_SETFL, O_NONBLOCK);
@@ -260,7 +263,7 @@ bool Client::connectSocket()
         cout << "ERORR: Client::connectSocket" << endl;
         return false;
     } else {
-        cout << "Client::connectSocket: mSocket is connecting" << endl;
+        //cout << "Client::connectSocket: mSocket is connecting" << endl;
         return true;
     }
 }
@@ -278,6 +281,9 @@ void Client::processMailType(Mail& mail)
         break;
     case CLIENT_LOGIN:
         processMailClientLOgin(mail);
+        break;
+    case DISCONNECT_CLIENT:
+        processMailDisconnectClient(mail);
         break;
     default:
         cout << "ERROR: Client::processMailType: mail.typeMail = "<< mail.typeMail << endl;
@@ -311,13 +317,17 @@ void Client::processMailClientLOgin(Mail& mail)
         cout << mail.data << endl;
         sendClientLogin(getmClientName(mClientName));
     }
-    /*
-    if(mail.data[0] != 0){
-        cout << "Log in to the server with a nickname: " << mClientName << endl;
-    } else{
-        memset(mClientName, 0,sizeof(mClientName));
-        cout << "Name not available"<< endl;
+}
+
+//-----------------------------------------------------------------------------
+void Client::processMailDisconnectClient(Mail& mail)
+//-----------------------------------------------------------------------------
+{
+    if (mail.data[0] != 0) {
+        cout << mail.data << flush;
+    }
+
+    if (createSocket() && connectSocket()) {
         sendClientLogin(getmClientName(mClientName));
     }
-    */
 }

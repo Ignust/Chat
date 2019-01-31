@@ -37,6 +37,7 @@ private:
     void processMailMessage(Mail&);
     void processMailCommand(Mail&);
     void processMailClientLOgin(Mail&);
+    void processMailDisconnectClient(Mail&);
 
 private:
 
@@ -45,6 +46,7 @@ private:
     fd_set mSet;
     Mail mMail;
     char mClientName[ARRAY_SIZE];
+    bool mOutput;
 
 };
 
