@@ -213,11 +213,11 @@ char* Client::getmClientName(char* name)
 }
 
 //-----------------------------------------------------------------------------
-void Client::getClientPassword(char* name)
+void Client::getClientPassword(char* password)
 //-----------------------------------------------------------------------------
 {
     cout << "Enter password" << endl;
-    cin >> name;
+    cin >> password;
 }
 
 //-----------------------------------------------------------------------------

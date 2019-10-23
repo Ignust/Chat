@@ -5,11 +5,14 @@
 using std::queue;
 #include <list>
 using std::list;
+#include<map>
+using std::map;
 
 #include "ClientTypes.hpp"
 #include "MailTypes.hpp"
 #include "DataBase.hpp"
 #include"Tools.hpp"
+
 //#include"EventHandler.hpp"
 class EventHandler;
 
@@ -38,7 +41,7 @@ private:
     void processMailDisconnectServer(Mail&);
     void processMailDisconnectClient(Mail&);
     void DisconnectClient(int);
-    bool checkNewClientName(char*);
+    bool checkClientName(char*);
     void addClientToListFromDatabase(Mail, char*);
     char* getClietName(int);
     void addClientToDatabase(const Client &);
@@ -47,7 +50,7 @@ private:
     void parseClientFromTheDatabase(Client&, char*);
 
 private:
-    list<Client> mClients;
+    map<int,Client> mClients;
     queue<Mail> mMails;
     EventHandler& mEvHndlr;
     DataBase mDataBase;
