@@ -19,32 +19,32 @@ public:
 private:
     bool initClient();
     void checkKeyboardInput();
-    void sendMail(Mail& );
+    void sendMail(const Mail& );
 
-    bool checkInputCommand(Mail&);
+    bool checkInputCommand(const Mail&);
     void processingCommandHelp();
     void processingCommandDisconnectServer();
     void processingCommandDisconnectClient();
 
-    void processingInputCommand(Mail&);
+    void processingInputCommand(const Mail&);
     void checkMessenger();
     char* getmClientName(char *);
     void getClientPassword(char *);
     void sendClientLogin(char *);
     bool createSocket();
     bool connectSocket();
-    void processMailType(Mail&);
-    void processMailMessage(Mail&);
-    void processMailCommand(Mail&);
-    void processMailClientLOgin(Mail&);
-    void processMailDisconnectClient(Mail&);
+    void processMailType(const Mail&);
+    void processMailMessage(const Mail&);
+    void processMailCommand(const Mail&);
+    void processMailClientLOgin(const Mail&);
+    void processMailDisconnectClient(const Mail&);
 
 private:
 
     int mSocket;
     struct sockaddr_in mSockAddr;
     fd_set mSet;
-    Mail mMail;
+    //Mail mMail;
     char mClientName[ARRAY_SIZE];
     bool mOutput;
 

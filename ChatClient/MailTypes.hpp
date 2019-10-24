@@ -1,6 +1,7 @@
 #ifndef MAILTYPES_HPP
 #define MAILTYPES_HPP
 
+
 enum MAIL_TYPE
 {
     MESSAGE

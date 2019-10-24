@@ -17,7 +17,7 @@ Client::Client()
     : mSocket(0)
     , mSockAddr()
     , mSet()
-    , mMail()
+    //, mMail()
     , mOutput(false)
 {
     memset(mClientName, 0, sizeof (mClientName));
@@ -90,14 +90,14 @@ void Client::checkKeyboardInput()
 }
 
 //-----------------------------------------------------------------------------
-void Client::sendMail(Mail& mail)
+void Client::sendMail(const Mail& mail)
 //-----------------------------------------------------------------------------
 {
     send (mSocket, &mail, sizeof (Mail), 0);
 }
 
 //-----------------------------------------------------------------------------
-bool Client::checkInputCommand(Mail& mail)
+bool Client::checkInputCommand(const Mail& mail)
 //-----------------------------------------------------------------------------
 {
     if (mail.data[0] == '/') {
@@ -108,7 +108,7 @@ bool Client::checkInputCommand(Mail& mail)
 }
 
 //-----------------------------------------------------------------------------
-void Client::processingInputCommand(Mail& mail)
+void Client::processingInputCommand( const Mail& mail)
 //-----------------------------------------------------------------------------
 {
     if (0 == strcmp ("/help\n", mail.data) ) {
@@ -269,7 +269,7 @@ bool Client::connectSocket()
 }
 
 //-----------------------------------------------------------------------------
-void Client::processMailType(Mail& mail)
+void Client::processMailType(const Mail& mail)
 //-----------------------------------------------------------------------------
 {
     switch (mail.typeMail) {
@@ -291,7 +291,7 @@ void Client::processMailType(Mail& mail)
 }
 
 //-----------------------------------------------------------------------------
-void Client::processMailMessage(Mail& mail)
+void Client::processMailMessage(const Mail& mail)
 //-----------------------------------------------------------------------------
 {
     if (mail.data[0] != 0) {
@@ -300,14 +300,14 @@ void Client::processMailMessage(Mail& mail)
 }
 
 //-----------------------------------------------------------------------------
-void Client::processMailCommand(Mail& mail)
+void Client::processMailCommand(const Mail& mail)
 //-----------------------------------------------------------------------------
 {
     cout << "Client::processMailCommand:" << mail.data << endl;
 }
 
 //-----------------------------------------------------------------------------
-void Client::processMailClientLOgin(Mail& mail)
+void Client::processMailClientLOgin(const Mail& mail)
 //-----------------------------------------------------------------------------
 {
     if (0 == strcmp(mail.data, mClientName)) {
@@ -320,7 +320,7 @@ void Client::processMailClientLOgin(Mail& mail)
 }
 
 //-----------------------------------------------------------------------------
-void Client::processMailDisconnectClient(Mail& mail)
+void Client::processMailDisconnectClient(const Mail& mail)
 //-----------------------------------------------------------------------------
 {
     if (mail.data[0] != 0) {
