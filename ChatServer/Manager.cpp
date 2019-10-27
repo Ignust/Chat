@@ -114,11 +114,12 @@ int Manager::getClient(int number)
         return it->clientId;
         */
     for(auto it : mClients){
-        if(number = 0){
+        if(number == 0){
             return it.first;
         }
         --number;
     }
+    return -1;
 }
 
 //------------------------------------------------------------------------------------------
@@ -159,14 +160,18 @@ void Manager::processMailMessage(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     char* clientNameOfMail = getClietName(mail.clientId);
+    if(clientNameOfMail == nullptr){
+        cout << "Manager::processMailMessage() clientNameOfMail == nullptr" << endl;
+        return;
+    }
     for(auto it : mClients){
         if (it.first != mail.clientId
                 && it.second.clientName[0] != 0
                 && it.first !=0) {
             Mail tempMail;
             tempMail.typeMail = MESSAGE;
-            snprintf (tempMail.data,sizeof (tempMail.data), "[ %s ]: %s", clientNameOfMail
-                      , mail.data);
+            snprintf (tempMail.data,sizeof (tempMail.data), "[ %.25s ]: %.992s",
+                      clientNameOfMail, mail.data);
             cout <<"Manager::processMailMessage: id = " << it.first <<"; data: "
                 << mail.data << flush;
             sendMail(tempMail, it.first);
@@ -318,7 +323,7 @@ void Manager::addClientToList(Mail& mail, char* clientName, char* clientPassword
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailDisconnectServer(Mail& mail)
+void Manager::processMailDisconnectServer(Mail&)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::processMailDisconnectServer" << endl;
@@ -329,33 +334,21 @@ void Manager::processMailDisconnectServer(Mail& mail)
 void Manager::processMailDisconnectClient(Mail& mail)
 //------------------------------------------------------------------------------------------
 {
-
     Mail tempMail;
     cout << "Manager::processMailDisconnectClient" << endl;
-
     for(auto &it : mClients){
         if (0 == strcmp(it.second.clientName, mail.data)) {
             tempMail.typeMail = DISCONNECT_CLIENT;
-            snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: %s disconnected you from the server\n"
+            snprintf (tempMail.data,sizeof (tempMail.data),
+                      "[ ChatServer ]: %.100s disconnected you from the server\n"
                       , getClietName(mail.clientId));
             sendMail(tempMail, it.first);
             mEvHndlr.responseDisconnectClient(it.first);
             return;
         }
     }
-    /*
-    for (std::map<int,Client>::iterator it = mClients.begin(); it != mClients.end(); ++it) {
-        if (0 == strcmp(it->clientName, mail.data)) {
-            tempMail.typeMail = DISCONNECT_CLIENT;
-            snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: %s disconnected you from the server\n"
-                      , getClietName(mail.clientId));
-            sendMail(tempMail, it->clientId);
-            mEvHndlr.responseDisconnectClient(it->clientId);
-            return;
-        }
-    }*/
     tempMail.typeMail = MESSAGE;
-    snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: clietn %s not found\n"
+    snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: client %.100s not found\n"
               , mail.data);
     sendMail(tempMail, mail.clientId);
 }
@@ -403,8 +396,8 @@ void Manager::addClientToDatabase(const Client& client)
 //------------------------------------------------------------------------------------------
 {
     char tempClientData[1024] = {};
-    snprintf(tempClientData, sizeof(tempClientData),"%s %s %c", client.clientName, client.ClientPassword
-             , client.ClientLvl);
+    snprintf(tempClientData, sizeof(tempClientData),"%.100s %.100s %c",
+             client.clientName, client.ClientPassword, client.ClientLvl);
     mDataBase.writeToDatabase(tempClientData);
 }
 
@@ -412,12 +405,12 @@ void Manager::addClientToDatabase(const Client& client)
 void Manager::parseClientLogin( char* clientName, char* clientPassword,Mail& mail)
 //------------------------------------------------------------------------------------------
 {
-    int clientNameLen = 0;
-    int clientPasswordLen = 0;
+    unsigned long clientNameLen = 0;
+    unsigned long clientPasswordLen = 0;
 
     // Ищем пробел и длинну строк
     char *space = strstr(mail.data, " ");
-    clientNameLen = space - mail.data;
+    clientNameLen =static_cast<unsigned long>(space - mail.data);
     clientPasswordLen = strlen(mail.data) - clientNameLen - 1;
 
     // Копируем первое слово
@@ -449,12 +442,12 @@ void Manager::loadClientsFromTheDatabase()
 void Manager::parseClientFromTheDatabase(Client& client, char* data)
 //------------------------------------------------------------------------------------------
 {
-    int clientNameLen = 0;
-    int clientPasswordLen = 0;
+    unsigned long clientNameLen = 0;
+    unsigned long clientPasswordLen = 0;
 
     // Ищем пробел и длинну строк
     char *space = strstr(data, " ");
-    clientNameLen = space - data;
+    clientNameLen =static_cast<unsigned long>(space - data);
     clientPasswordLen = strlen(data) - clientNameLen - 1;
 
     // Копируем первое слово
