@@ -28,10 +28,7 @@ void Manager::pushClient(int newClient)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::pushClient: newClient = " << newClient << endl;
-    Client tempClient;
-    //tempClient.clientId = newClient;
-    mClients.emplace(newClient,&tempClient);
-    //mClients.push_back(tempClient);
+    mClients.emplace(newClient, Client{});
 }
 
 //------------------------------------------------------------------------------------------
@@ -47,15 +44,6 @@ void Manager::addClientToListFromDatabase(Mail mail, char* clientFromDatabase)
             sendMail(tempMail,it.second.clientId);
         }
     }
-    /*for (auto it = mClients.begin(); it != mClients.end(); ++it) {
-        if (it->clientId == mail.clientId) {
-            parseClientFromTheDatabase(*it, clientFromDatabase);
-            Mail tempMail;
-            tempMail.typeMail = CLIENT_LOGIN;
-            strcpy(tempMail.data,it->clientName);
-            sendMail(tempMail,it->clientId);
-        }
-    }*/
 }
 
 //------------------------------------------------------------------------------------------
