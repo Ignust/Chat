@@ -15,6 +15,12 @@ struct Mail
 {
     MAIL_TYPE typeMail;
     char data[1024];
+    //int clientId;
+};
+
+struct WrapMail
+{
+    Mail mail;
     int clientId;
 };
 
