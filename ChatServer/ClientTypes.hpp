@@ -4,7 +4,7 @@
 
 struct Client
 {
-    int clientId;
+    //int clientId;
     char clientName[1024];
     char ClientPassword[1024];
     char ClientLvl ;

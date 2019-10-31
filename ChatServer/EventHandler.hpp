@@ -15,12 +15,12 @@ public:
 
     void start[[noreturn]]();
     void responseDisconnectServer();
-    void responseDisconnectClient(int);
+    void responseDisconnectClient(const int);
 
 private:
     void subscribeClient();
-    void unsubscribeClient(int);
-    bool sendMail(int);
+    void unsubscribeClient(const int);
+    bool sendMail(const int);
 
     void initReadSet();
     int getMaxClientId();

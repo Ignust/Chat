@@ -24,7 +24,7 @@ Manager::Manager(EventHandler& eventHandler)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::pushClient(int newClient)
+void Manager::pushClient(const int newClient)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::pushClient: newClient = " << newClient << endl;
@@ -32,7 +32,7 @@ void Manager::pushClient(int newClient)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::addClientToListFromDatabase(Mail mail, char* clientFromDatabase)
+void Manager::addClientToListFromDatabase(const Mail mail, char* clientFromDatabase)
 //------------------------------------------------------------------------------------------
 {
     for(auto &it : mClients){
@@ -41,13 +41,13 @@ void Manager::addClientToListFromDatabase(Mail mail, char* clientFromDatabase)
             Mail tempMail;
             tempMail.typeMail = CLIENT_LOGIN;
             strcpy(tempMail.data,it.second.clientName);
-            sendMail(tempMail,it.second.clientId);
+            sendMail(tempMail,it.first);
         }
     }
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::popClient(int ClientId)
+void Manager::popClient(const int ClientId)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::popClient: ClientId = " << ClientId;
@@ -58,25 +58,17 @@ void Manager::popClient(int ClientId)
             return;
         }
     }
-/*
-    for (list<Client>::iterator it = mClients.begin(); it != mClients.end(); ++it) {
-        if (it->clientId == ClientId) {
-            it = mClients.erase(it);
-            cout << " was erased" << endl;
-            return;
-        }
-    }*/
 }
 
 //------------------------------------------------------------------------------------------
-bool Manager::pushMail(int client)
+bool Manager::pushMail(const int client)
 //------------------------------------------------------------------------------------------
 {
     Mail tempMail;
     int bytesRecv = static_cast<int>( recv(client, &tempMail, sizeof(Mail), 0) );
     if (bytesRecv <= 0) {
         cout << "Manager::pushMail: bytesRecv <= 0" << endl;
-        //Drop the client
+        DisconnectClient(client);
         return false;
     } else {
         tempMail.clientId = client;
@@ -106,24 +98,18 @@ int Manager::getAmountOfClient() const
 int Manager::getClient(int number)
 //------------------------------------------------------------------------------------------
 {
-    /*list<Client>::iterator it = mClients.begin();
-    while (number != 0) {
-        it++;
-        number--;
-    }
-        return it->clientId;
-        */
     for(auto it : mClients){
         if(number == 0){
             return it.first;
         }
         --number;
     }
-    return -1;
+    //cout << " Erorr: Manager::getClient(int) " << endl;
+    return 0;
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::sendMail(Mail& meil, int clietn)
+void Manager::sendMail(Mail& meil, int clietn)const
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::sendMail: to -> " << clietn << endl;
@@ -131,7 +117,7 @@ void Manager::sendMail(Mail& meil, int clietn)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailType(Mail& mail)
+void Manager::processMailType(const Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     switch (mail.typeMail) {
@@ -156,7 +142,7 @@ void Manager::processMailType(Mail& mail)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailMessage(Mail& mail)
+void Manager::processMailMessage(const Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     char* clientNameOfMail = getClietName(mail.clientId);
@@ -177,25 +163,10 @@ void Manager::processMailMessage(Mail& mail)
             sendMail(tempMail, it.first);
         }
     }
-
-    /*
-    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
-        if (it->clientId != mail.clientId
-                && it->clientName[0] != 0
-                && it->clientId !=0) {
-            Mail tempMail;
-            tempMail.typeMail = MESSAGE;
-            snprintf (tempMail.data,sizeof (tempMail.data), "[ %s ]: %s", clientNameOfMail
-                      , mail.data);
-            cout <<"Manager::processMailMessage: id = " << it->clientId <<"; data: "
-                << mail.data << flush;
-            sendMail(tempMail, it->clientId);
-        }
-    }*/
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailClientLogin(Mail& mail)
+void Manager::processMailClientLogin(const Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     char clientName[1024] = {};
@@ -223,11 +194,10 @@ void Manager::processMailClientLogin(Mail& mail)
         cout << "Error Manager::processMailClientLogin: switch()" << endl;
         break;
     }
-
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processInvalidPassword(Mail& mail)
+void Manager::processInvalidPassword(const Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     Mail tempMail;
@@ -237,7 +207,7 @@ void Manager::processInvalidPassword(Mail& mail)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processClientFound(Mail& mail, char* clientName)
+void Manager::processClientFound(const Mail& mail, char* clientName)
 //------------------------------------------------------------------------------------------
 {
     int clientId = getClientId(clientName);
@@ -253,7 +223,7 @@ void Manager::processClientFound(Mail& mail, char* clientName)
 }
 
 //------------------------------------------------------------------------------------------
-int Manager::getClientId(char* clientName)
+int Manager::getClientId(const char* clientName)
 //------------------------------------------------------------------------------------------
 {
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
@@ -264,7 +234,7 @@ int Manager::getClientId(char* clientName)
     return -1;
 }
 
-bool Manager::checkClientNameInDatabase(char* clientName, char* clientPassword)
+bool Manager::checkClientNameInDatabase(const char* clientName,const char* clientPassword)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::checkClientNameInDatabase()" << endl;
@@ -283,7 +253,7 @@ bool Manager::checkClientNameInDatabase(char* clientName, char* clientPassword)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::addClientToList(Mail& mail, char* clientName, char* clientPassword)
+void Manager::addClientToList(const Mail& mail, char* clientName, char* clientPassword)
 //------------------------------------------------------------------------------------------
 {
     for(auto &it : mClients){
@@ -302,28 +272,10 @@ void Manager::addClientToList(Mail& mail, char* clientName, char* clientPassword
             addClientToDatabase(it.second);
         }
     }
-/*
-    for (auto it = mClients.begin(); it != mClients.end(); ++it) {
-
-        if (it ->clientId == mail.clientId) {
-            strncpy(it->clientName, clientName, sizeof (char[1024]));
-            strncpy(it->ClientPassword, clientPassword, sizeof (char[1024]));
-            it->ClientLvl = '0';
-            Mail tempMail;
-            tempMail.typeMail = CLIENT_LOGIN;
-            strcpy(tempMail.data,clientName);
-            sendMail(tempMail,it->clientId);
-            cout << "Manager::addClientToList:"
-                 << " ClientId: " << it->clientId
-                 << " ClientName: " << it->clientName << endl;
-            addClientToDatabase(*it);
-        }
-
-        }*/
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailDisconnectServer(Mail&)
+void Manager::processMailDisconnectServer(const Mail&)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::processMailDisconnectServer" << endl;
@@ -331,7 +283,7 @@ void Manager::processMailDisconnectServer(Mail&)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailDisconnectClient(Mail& mail)
+void Manager::processMailDisconnectClient(const Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     Mail tempMail;
@@ -354,7 +306,7 @@ void Manager::processMailDisconnectClient(Mail& mail)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::DisconnectClient(int clientId)
+void Manager::DisconnectClient(const int clientId)
 //------------------------------------------------------------------------------------------
 {
     Mail tempMail;
@@ -367,7 +319,7 @@ void Manager::DisconnectClient(int clientId)
 }
 
 //------------------------------------------------------------------------------------------
-bool Manager::checkClientName(char* clientName)
+bool Manager::checkClientName(const char* clientName)
 //------------------------------------------------------------------------------------------
 {
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
@@ -379,7 +331,7 @@ bool Manager::checkClientName(char* clientName)
 }
 
 //------------------------------------------------------------------------------------------
-char* Manager::getClietName(int client)
+char* Manager::getClietName(const int client)
 //------------------------------------------------------------------------------------------
 {
     for (auto it = mClients.begin(); it != mClients.end(); ++it) {
@@ -402,14 +354,14 @@ void Manager::addClientToDatabase(const Client& client)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::parseClientLogin( char* clientName, char* clientPassword,Mail& mail)
+void Manager::parseClientLogin( char* clientName, char* clientPassword,const Mail& mail)
 //------------------------------------------------------------------------------------------
 {
     unsigned long clientNameLen = 0;
     unsigned long clientPasswordLen = 0;
 
     // Ищем пробел и длинну строк
-    char *space = strstr(mail.data, " ");
+    const char *space = strstr(mail.data, " ");
     clientNameLen =static_cast<unsigned long>(space - mail.data);
     clientPasswordLen = strlen(mail.data) - clientNameLen - 1;
 

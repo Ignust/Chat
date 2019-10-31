@@ -18,7 +18,6 @@ void EventHandler::start[[noreturn]]()
 //-----------------------------------------------------------------------------
 {
     while (1) {
-        //std::cout << "EventHandler::start" << std::endl;
         initReadSet();
         checkNewClient();
         checkNewMails();
@@ -50,7 +49,7 @@ void EventHandler::subscribeClient()
 }
 
 //-----------------------------------------------------------------------------
-void EventHandler::unsubscribeClient(int client)
+void EventHandler::unsubscribeClient(const int client)
 //-----------------------------------------------------------------------------
 {
     std::cout << "EventHandler::unsubscribeClient: client = " << client << std::endl;
@@ -59,7 +58,7 @@ void EventHandler::unsubscribeClient(int client)
 }
 
 //-----------------------------------------------------------------------------
-bool EventHandler::sendMail(int mail)
+bool EventHandler::sendMail(const int mail)
 //-----------------------------------------------------------------------------
 {
     return  mManager.pushMail(mail);

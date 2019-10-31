@@ -21,31 +21,31 @@ class Manager
 public:
     Manager(EventHandler&);
 
-    void pushClient(int);
-    void popClient(int);
-    bool pushMail(int);
+    void pushClient(const int);
+    void popClient(const int);
+    bool pushMail(const int);
     void processMails();
     int getAmountOfClient() const;
     int getClient(int);
 
 private:
-    void sendMail(Mail&, int);
-    void processMailType(Mail&);
-    void processMailMessage(Mail&);
-    void processMailClientLogin(Mail&);
-    void processInvalidPassword(Mail&);
-    void processClientFound(Mail&, char*);
-    int getClientId(char*);
-    bool checkClientNameInDatabase(char*, char*);
-    void addClientToList(Mail&, char*, char*);
-    void processMailDisconnectServer(Mail&);
-    void processMailDisconnectClient(Mail&);
-    void DisconnectClient(int);
-    bool checkClientName(char*);
-    void addClientToListFromDatabase(Mail, char*);
-    char* getClietName(int);
+    void sendMail(Mail&, int)const;
+    void processMailType(const Mail&);
+    void processMailMessage(const Mail&);
+    void processMailClientLogin(const Mail&);
+    void processInvalidPassword(const Mail&);
+    void processClientFound(const Mail&, char*);
+    int getClientId(const char*);
+    bool checkClientNameInDatabase(const char*,const char*);
+    void addClientToList(const Mail&, char*, char*);
+    void processMailDisconnectServer(const Mail&);
+    void processMailDisconnectClient(const Mail&);
+    void DisconnectClient(const int);
+    bool checkClientName(const char*);
+    void addClientToListFromDatabase(const Mail, char*);
+    char* getClietName(const int);
     void addClientToDatabase(const Client &);
-    void parseClientLogin(char*, char*,Mail&);
+    void parseClientLogin(char*, char*,const Mail&);
     void loadClientsFromTheDatabase();
     void parseClientFromTheDatabase(Client&, char*);
 

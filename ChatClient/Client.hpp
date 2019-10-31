@@ -44,7 +44,6 @@ private:
     int mSocket;
     struct sockaddr_in mSockAddr;
     fd_set mSet;
-    //Mail mMail;
     char mClientName[ARRAY_SIZE];
     bool mOutput;
 
