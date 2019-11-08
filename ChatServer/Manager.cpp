@@ -71,7 +71,6 @@ bool Manager::pushMail(const int client)
         DisconnectClient(client);
         return false;
     } else {
-        //tempmail.mail.clientId = client;
         WrapMail tempWrapMail;
         tempWrapMail.mail = tempMail;
         tempWrapMail.clientId = client;
