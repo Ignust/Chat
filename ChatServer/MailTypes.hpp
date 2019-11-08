@@ -32,7 +32,7 @@ class CWrapMail{
     CWrapMail(const Mail& mail,const int Id)
         :typeMail(mail.typeMail), data(mail.data), clientId(Id)
     {}
-    void getMail( Mail& mail){
+    void getMail( Mail& mail)const{
         std::copy(data.begin(),data.end(),mail.data);
         mail.typeMail = typeMail;
     }

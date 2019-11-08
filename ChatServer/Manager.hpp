@@ -30,28 +30,28 @@ public:
 
 private:
     void sendMail(Mail&, int)const;
-    void processMailType(const WrapMail&);
-    void processMailMessage(const WrapMail&);
-    void processMailClientLogin(const WrapMail&);
-    void processInvalidPassword(const WrapMail&);
-    void processClientFound(const WrapMail&, char*);
+    void processMailType(const CWrapMail&);
+    void processMailMessage(const CWrapMail&);
+    void processMailClientLogin(const CWrapMail&);
+    void processInvalidPassword(const CWrapMail&);
+    void processClientFound(const CWrapMail&, char*);
     int getClientId(const char*);
     bool checkClientNameInDatabase(const char*,const char*);
-    void addClientToList(const WrapMail&, char*, char*);
-    void processMailDisconnectServer(const WrapMail&);
-    void processMailDisconnectClient(const WrapMail&);
+    void addClientToList(const CWrapMail&, char*, char*);
+    void processMailDisconnectServer(const CWrapMail&);
+    void processMailDisconnectClient(const CWrapMail&);
     void DisconnectClient(const int);
     bool checkClientName(const char*);
-    void addClientToListFromDatabase(const WrapMail, char*);
+    void addClientToListFromDatabase(const CWrapMail, char*);
     char* getClietName(const int);
     void addClientToDatabase(const Client &);
-    void parseClientLogin(char*, char*,const WrapMail&);
+    void parseClientLogin(char*, char*,const CWrapMail&);
     void loadClientsFromTheDatabase();
     void parseClientFromTheDatabase(Client&, char*);
 
 private:
     map<int,Client> mClients;
-    queue<WrapMail> mMails;
+    queue<CWrapMail> mMails;
     EventHandler& mEvHndlr;
     DataBase mDataBase;
 

@@ -4,6 +4,7 @@
 #include<stdio.h>//snprintf();
 #include <iostream>
 #include<memory>
+#include <sstream>
 using std::cout;
 using std::endl;
 using std::flush;
@@ -32,11 +33,11 @@ void Manager::pushClient(const int newClient)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::addClientToListFromDatabase(const WrapMail wrapMail, char* clientFromDatabase)
+void Manager::addClientToListFromDatabase(const CWrapMail CWrapMail, char* clientFromDatabase)
 //------------------------------------------------------------------------------------------
 {
     for(auto &it : mClients){
-        if (it.first == wrapMail.clientId) {
+        if (it.first == CWrapMail.clientId) {
             parseClientFromTheDatabase(it.second, clientFromDatabase);
             Mail tempMail;
             tempMail.typeMail = CLIENT_LOGIN;
@@ -71,10 +72,8 @@ bool Manager::pushMail(const int client)
         DisconnectClient(client);
         return false;
     } else {
-        WrapMail tempWrapMail;
-        tempWrapMail.mail = tempMail;
-        tempWrapMail.clientId = client;
-        mMails.push(tempWrapMail);
+        CWrapMail tempCWrapMail(tempMail,client);
+        mMails.push(tempCWrapMail);
         return true;
     }
 }
@@ -111,83 +110,85 @@ int Manager::getClient(int number)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::sendMail(Mail& meil, int clietn)const
+void Manager::sendMail(Mail& mail, int clietn)const
 //------------------------------------------------------------------------------------------
 {
-    cout << "Manager::sendMail: to -> " << clietn << endl;
-    send(clietn, &meil, sizeof (Mail), 0);
+    cout << "Manager::sendMail: to -> " << clietn  << " data: " << mail.data << endl;
+    send(clietn, &mail, sizeof (Mail), 0);
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailType(const WrapMail& wrapMail)
+void Manager::processMailType(const CWrapMail& CWrapMail)
 //------------------------------------------------------------------------------------------
 {
-    switch (wrapMail.mail.typeMail) {
+    switch (CWrapMail.typeMail) {
     case MESSAGE:
-        processMailMessage(wrapMail);
+        processMailMessage(CWrapMail);
         break;
     case COMMAND:
         //
         break;
     case CLIENT_LOGIN:
-        processMailClientLogin(wrapMail);
+        processMailClientLogin(CWrapMail);
         break;
     case DISCONNECT_SERVER:
-        processMailDisconnectServer(wrapMail);
+        processMailDisconnectServer(CWrapMail);
         break;
     case DISCONNECT_CLIENT:
-        processMailDisconnectClient(wrapMail);
+        processMailDisconnectClient(CWrapMail);
         break;
     default:
-        cout << "ERROR: Manager::processMailType: mail.mail.typeMail = "<< wrapMail.mail.typeMail << endl;
+        cout << "ERROR: Manager::processMailType: mail.mail.typeMail = "<< CWrapMail.typeMail << endl;
     }
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailMessage(const WrapMail& wrapMail)
+void Manager::processMailMessage(const CWrapMail& CWrapMail)
 //------------------------------------------------------------------------------------------
 {
-    char* clientNameOfMail = getClietName(wrapMail.clientId);
+    char* clientNameOfMail = getClietName(CWrapMail.clientId);
     if(clientNameOfMail == nullptr){
         cout << "Manager::processMailMessage() clientNameOfMail == nullptr" << endl;
         return;
     }
     for(auto it : mClients){
-        if (it.first != wrapMail.clientId
+        if (it.first != CWrapMail.clientId
                 && it.second.clientName[0] != 0
                 && it.first !=0) {
+            Mail mail;
+            CWrapMail.getMail(mail);
             Mail tempMail;
             tempMail.typeMail = MESSAGE;
             snprintf (tempMail.data,sizeof (tempMail.data), "[ %.25s ]: %.992s",
-                      clientNameOfMail, wrapMail.mail.data);
+                      clientNameOfMail, mail.data);
             cout <<"Manager::processMailMessage: id = " << it.first <<"; data: "
-                << wrapMail.mail.data << flush;
+                << CWrapMail.data << flush;
             sendMail(tempMail, it.first);
         }
     }
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailClientLogin(const WrapMail& wrapMail)
+void Manager::processMailClientLogin(const CWrapMail& CWrapMail)
 //------------------------------------------------------------------------------------------
 {
     char clientName[1024] = {};
     char clientPassword[1024] = {};
-    parseClientLogin(clientName, clientPassword,wrapMail);
+    parseClientLogin(clientName, clientPassword,CWrapMail);
 
     switch (mDataBase.checkClientInData(clientName,clientPassword)) {
     case INVALID_NAME:
         cout << "Manager::processMailClientLogin:processInvalidName()" << endl;
         //processInvalidName();
-        addClientToList(wrapMail, clientName, clientPassword);
+        addClientToList(CWrapMail, clientName, clientPassword);
         break;
     case INVALID_PASSWORD:
         cout << "Manager::processMailClientLogin:processInvalidPassword()" << endl;
-        processInvalidPassword(wrapMail);
+        processInvalidPassword(CWrapMail);
         break;
     case CLIENT_FOUND:
         cout << "Manager::processMailClientLogin:processClientFound()" << endl;
-        processClientFound(wrapMail, clientName);
+        processClientFound(CWrapMail, clientName);
         break;
     case OTHER:
         cout << "Manager::processMailClientLogin:OTHER()" << endl;
@@ -199,17 +200,17 @@ void Manager::processMailClientLogin(const WrapMail& wrapMail)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processInvalidPassword(const WrapMail& wrapMail)
+void Manager::processInvalidPassword(const CWrapMail& CWrapMail)
 //------------------------------------------------------------------------------------------
 {
     Mail tempMail;
     tempMail.typeMail = CLIENT_LOGIN;
     snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: invalid password");
-    sendMail(tempMail, wrapMail.clientId);
+    sendMail(tempMail, CWrapMail.clientId);
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processClientFound(const WrapMail& wrapMail, char* clientName)
+void Manager::processClientFound(const CWrapMail& CWrapMail, char* clientName)
 //------------------------------------------------------------------------------------------
 {
     int clientId = getClientId(clientName);
@@ -219,7 +220,7 @@ void Manager::processClientFound(const WrapMail& wrapMail, char* clientName)
 
     char tempClientforDataBase[1024] = {};
     if (mDataBase.getClientByName(tempClientforDataBase,clientName)){
-        addClientToListFromDatabase(wrapMail, tempClientforDataBase);
+        addClientToListFromDatabase(CWrapMail, tempClientforDataBase);
     }
 
 }
@@ -255,12 +256,12 @@ bool Manager::checkClientNameInDatabase(const char* clientName,const char* clien
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::addClientToList(const WrapMail& wrapMail, char* clientName, char* clientPassword)
+void Manager::addClientToList(const CWrapMail& CWrapMail, char* clientName, char* clientPassword)
 //------------------------------------------------------------------------------------------
 {
     for(auto &it : mClients){
 
-        if (it.first == wrapMail.clientId) {
+        if (it.first == CWrapMail.clientId) {
             strncpy(it.second.clientName, clientName, sizeof (char[1024]));
             strncpy(it.second.ClientPassword, clientPassword, sizeof (char[1024]));
             it.second.ClientLvl = '0';
@@ -277,7 +278,7 @@ void Manager::addClientToList(const WrapMail& wrapMail, char* clientName, char* 
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailDisconnectServer(const WrapMail&)
+void Manager::processMailDisconnectServer(const CWrapMail&)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::processMailDisconnectServer" << endl;
@@ -285,17 +286,19 @@ void Manager::processMailDisconnectServer(const WrapMail&)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::processMailDisconnectClient(const WrapMail& wrapMail)
+void Manager::processMailDisconnectClient(const CWrapMail& CWrapMail)
 //------------------------------------------------------------------------------------------
 {
     Mail tempMail;
+    Mail mail;
+    CWrapMail.getMail(mail);
     cout << "Manager::processMailDisconnectClient" << endl;
     for(auto &it : mClients){
-        if (0 == strcmp(it.second.clientName, wrapMail.mail.data)) {
+        if (0 == strcmp(it.second.clientName, mail.data)) {
             tempMail.typeMail = DISCONNECT_CLIENT;
             snprintf (tempMail.data,sizeof (tempMail.data),
                       "[ ChatServer ]: %.100s disconnected you from the server\n"
-                      , getClietName(wrapMail.clientId));
+                      , getClietName(CWrapMail.clientId));
             sendMail(tempMail, it.first);
             mEvHndlr.responseDisconnectClient(it.first);
             return;
@@ -303,8 +306,8 @@ void Manager::processMailDisconnectClient(const WrapMail& wrapMail)
     }
     tempMail.typeMail = MESSAGE;
     snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: client %.100s not found\n"
-              , wrapMail.mail.data);
-    sendMail(tempMail, wrapMail.clientId);
+              , mail.data);
+    sendMail(tempMail, CWrapMail.clientId);
 }
 
 //------------------------------------------------------------------------------------------
@@ -356,19 +359,20 @@ void Manager::addClientToDatabase(const Client& client)
 }
 
 //------------------------------------------------------------------------------------------
-void Manager::parseClientLogin( char* clientName, char* clientPassword,const WrapMail& wrapMail)
+void Manager::parseClientLogin( char* clientName, char* clientPassword,const CWrapMail& CWrapMail)
 //------------------------------------------------------------------------------------------
 {
+    /*
     unsigned long clientNameLen = 0;
     unsigned long clientPasswordLen = 0;
 
     // Ищем пробел и длинну строк
-    const char *space = strstr(wrapMail.mail.data, " ");
-    clientNameLen =static_cast<unsigned long>(space - wrapMail.mail.data);
-    clientPasswordLen = strlen(wrapMail.mail.data) - clientNameLen - 1;
+    const char* space = strstr(CWrapMail.data, " ");
+    clientNameLen =static_cast<unsigned long>(space - CWrapMail.data);
+    clientPasswordLen = CWrapMail.data.size(); //strlen(CWrapMail.data) - clientNameLen - 1;
 
     // Копируем первое слово
-    strncpy(clientName, &wrapMail.mail.data[0], clientNameLen);
+    strncpy(clientName, &CWrapMail.data[0], clientNameLen);
     clientName[clientNameLen] = '\0';
 
     // Копируем остальную строку
@@ -376,6 +380,15 @@ void Manager::parseClientLogin( char* clientName, char* clientPassword,const Wra
 
     cout << "Manager::parseClientLogin: clientName = " << clientName << " clientPassword = "
          << clientPassword << endl;
+         */
+    std::istringstream iss(CWrapMail.data);
+    std::string stName;
+    std::string stPassword;
+    iss >> stName;
+    iss >> stPassword;
+    std::copy(stName.begin(), stName.end(), clientName);
+    std::copy(stPassword.begin(), stPassword.end(), clientPassword);
+    //cout <<"clientName = " << clientName  << " clientPassword = " << clientPassword << endl;
 }
 
 //------------------------------------------------------------------------------------------
