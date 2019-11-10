@@ -2,6 +2,6 @@
 *.user
 *.txt
 
-#build folders
+#Folders
 build
-
+.project

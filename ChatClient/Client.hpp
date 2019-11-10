@@ -2,12 +2,13 @@
 #define CLIENT_HPP
 
 #include <netinet/in.h>
-#include<sys/select.h>
-#include"MailTypes.hpp"
+#include <sys/select.h>
 
 #define PORT_ADDR 12345
 #define AMOUNT_EVENTS 5
 #define ARRAY_SIZE 20
+
+struct Mail;
 
 class Client
 {
@@ -28,7 +29,7 @@ private:
 
     void processingInputCommand(const Mail&);
     void checkMessenger();
-    char* getmClientName(char *);
+    char* getmClientName();
     void getClientPassword(char *);
     void sendClientLogin(char *);
     bool createSocket();
@@ -40,13 +41,10 @@ private:
     void processMailDisconnectClient(const Mail&);
 
 private:
-
     int mSocket;
-    struct sockaddr_in mSockAddr;
     fd_set mSet;
     char mClientName[ARRAY_SIZE];
     bool mOutput;
-
 };
 
 #endif // CLIENT_HPP

@@ -1,52 +1,43 @@
-#include<iostream>
-#include<pthread.h>
-#include<thread>
-#include<sys/epoll.h>
+#include <iostream>
+#include <pthread.h>
+#include <thread>
+#include <sys/epoll.h>
 #include <cstring>
-#include<unistd.h>
-#include<fcntl.h>
-#include<cstring>
-#include<stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <cstring>
+#include <stdio.h>
+
 using namespace std;
 
 #include "Client.hpp"
+#include "MailTypes.hpp"
 
 //-----------------------------------------------------------------------------
 Client::Client()
-//-----------------------------------------------------------------------------
     : mSocket(0)
-    , mSockAddr()
     , mSet()
-    //, mMail()
     , mOutput(false)
+//-----------------------------------------------------------------------------
 {
     memset(mClientName, 0, sizeof (mClientName));
-    if (initClient()) {
-        //cout << "Client::Client: Client init" << endl;
-    } else {
+    if (!initClient()) {
         cout << "Client::Client: Client was not init" << endl;
     }
-    start();
 }
 
 //-----------------------------------------------------------------------------
 bool Client::initClient()
 //-----------------------------------------------------------------------------
 {
-    if (mSocket != 0) {
-        return true;
-    }
-    if (createSocket() && connectSocket()) {
-        return true;
-    }
-    return false;
+    return createSocket() && connectSocket();
 }
 
 //-----------------------------------------------------------------------------
 void Client::start[[noreturn]]()
 //-----------------------------------------------------------------------------
 {
-    sendClientLogin(getmClientName(mClientName));
+    sendClientLogin(getmClientName());
 
     while (true) {
         checkMessenger();
@@ -93,18 +84,14 @@ void Client::checkKeyboardInput()
 void Client::sendMail(const Mail& mail)
 //-----------------------------------------------------------------------------
 {
-    send (mSocket, &mail, sizeof (Mail), 0);
+    send(mSocket, &mail, sizeof (Mail), 0);
 }
 
 //-----------------------------------------------------------------------------
 bool Client::checkInputCommand(const Mail& mail)
 //-----------------------------------------------------------------------------
 {
-    if (mail.data[0] == '/') {
-        return true;
-    }
-    return false;
-    //return (mail.data[0] == '/') ? true : false;
+    return (mail.data[0] == '/');
 }
 
 //-----------------------------------------------------------------------------
@@ -204,12 +191,12 @@ void Client::checkMessenger()
 }
 
 //-----------------------------------------------------------------------------
-char* Client::getmClientName(char* name)
+char* Client::getmClientName()
 //-----------------------------------------------------------------------------
 {
     cout << "Enter Name" << endl;
-    cin >> name;
-    return name;
+    cin >> mClientName;
+    return mClientName;
 }
 
 //-----------------------------------------------------------------------------
@@ -243,29 +230,26 @@ bool Client::createSocket()
     mSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (mSocket < 2) {
         cout << "ERORR: Client::createSocket: mSocket = "<< mSocket << endl;
-        return false;
-    } else {
-        //cout << "Client::createSocket: mSocket = "<< mSocket <<" was created" << endl;
-        return true;
     }
-    //fcntl(mSocket, F_SETFL, O_NONBLOCK);
+
+    return (mSocket >= 2);
 }
 
 //-----------------------------------------------------------------------------
 bool Client::connectSocket()
 //-----------------------------------------------------------------------------
 {
-    mSockAddr.sin_family = AF_INET;
-    mSockAddr.sin_port = htons(PORT_ADDR);
-    mSockAddr.sin_addr.s_addr = htons(INADDR_ANY);
+    struct sockaddr_in socketAddress{};
+    socketAddress.sin_family = AF_INET;
+    socketAddress.sin_port = htons(PORT_ADDR);
+    socketAddress.sin_addr.s_addr = htons(INADDR_ANY);
 
-    if (connect(mSocket,(sockaddr*)(&mSockAddr), sizeof (sockaddr)) < 0) {
+    const bool connectResult = ( 0 <= connect(mSocket,(sockaddr*)(&socketAddress), sizeof (sockaddr)) );
+    if (!connectResult) {
         cout << "ERORR: Client::connectSocket" << endl;
-        return false;
-    } else {
-        //cout << "Client::connectSocket: mSocket is connecting" << endl;
-        return true;
     }
+
+    return connectResult;
 }
 
 //-----------------------------------------------------------------------------
@@ -315,7 +299,7 @@ void Client::processMailClientLOgin(const Mail& mail)
     } else{
         memset(mClientName, 0,sizeof(mClientName));
         cout << mail.data << endl;
-        sendClientLogin(getmClientName(mClientName));
+        sendClientLogin(getmClientName());
     }
 }
 
@@ -328,6 +312,6 @@ void Client::processMailDisconnectClient(const Mail& mail)
     }
 
     if (createSocket() && connectSocket()) {
-        sendClientLogin(getmClientName(mClientName));
+        sendClientLogin(getmClientName());
     }
 }
