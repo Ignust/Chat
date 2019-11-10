@@ -1,12 +1,8 @@
 #ifndef EVENTHANDLER_HPP
 #define EVENTHANDLER_HPP
 
-#include <algorithm>
-
-#include "Server.hpp"
+class Server;
 #include "Manager.hpp"
-
-class Manager;
 
 class EventHandler
 {

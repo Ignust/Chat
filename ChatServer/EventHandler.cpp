@@ -1,7 +1,10 @@
 #include <iostream>
+#include <algorithm>
 #include <sys/select.h>
 
 #include "EventHandler.hpp"
+#include "Server.hpp"
+//#include "Manager.hpp"
 
 //-----------------------------------------------------------------------------
 EventHandler::EventHandler()
@@ -87,8 +90,8 @@ int EventHandler::getMaxClientId()
 {
     int maxClientId = mServer.getServer();
 
-    for (int i = mManager.getAmountOfClient(), client_Id = 0; i >= 0 ; --i) {
-        client_Id = mManager.getClient(i);
+    for (int i = mManager.getAmountOfClient(); i >= 0 ; --i) {
+        int client_Id = mManager.getClient(i);
         if (client_Id > maxClientId) {
             maxClientId = client_Id;
         }
@@ -110,8 +113,8 @@ void EventHandler::checkNewClient()
 void EventHandler::checkNewMails()
 //-----------------------------------------------------------------------------
 {
-    for (int i = mManager.getAmountOfClient(), client_Id = 0; i >= 0 ; --i) {
-        client_Id = mManager.getClient(i);
+    for (int i = mManager.getAmountOfClient(); i >= 0 ; --i) {
+        int client_Id = mManager.getClient(i);
         if (FD_ISSET(client_Id,&mReadset)) {
             std::cout << "EventHandler::checkNewMails: get respons for " << client_Id << std::endl;
             if (!(sendMail(client_Id))) {

@@ -155,7 +155,7 @@ void Manager::processMailMessage(const CWrapMail& CWrapMail)
         if (it.first != CWrapMail.clientId
                 && it.second.clientName[0] != 0
                 && it.first !=0) {
-            Mail mail;
+            Mail mail{};
             CWrapMail.getMail(mail);
             Mail tempMail;
             tempMail.typeMail = MESSAGE;
@@ -290,7 +290,7 @@ void Manager::processMailDisconnectClient(const CWrapMail& CWrapMail)
 //------------------------------------------------------------------------------------------
 {
     Mail tempMail;
-    Mail mail;
+    Mail mail{};
     CWrapMail.getMail(mail);
     cout << "Manager::processMailDisconnectClient" << endl;
     for(auto &it : mClients){
