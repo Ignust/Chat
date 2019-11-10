@@ -1,3 +1,7 @@
 *.pro
 *.user
+*.txt
+
+#build folders
+build
 

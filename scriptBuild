@@ -1,0 +1,40 @@
+#!/bin/bash
+
+CURRENT_DIR="$PWD"
+SERVER_DIR=$CURRENT_DIR/ChatServer
+CLIENT_DIR=$CURRENT_DIR/ChatClient
+SERVER_APP=$SERVER_DIR/build/ChatServer
+CLEINT_APP=$CLIENT_DIR/build/ChatClient
+
+#Build server application
+cd $SERVER_DIR
+if [ -d "$SERVER_DIR/build" ]; then
+  rm -r build
+fi
+mkdir build
+cd build
+cmake .. && make
+if [ $? -ne 0 ]; then
+   echo "Build of Server application is failed"
+   exit 1
+fi
+
+#Build Client application
+cd $CLIENT_DIR
+if [ -d "$CLIENT_DIR/build" ]; then
+  rm -r build
+fi
+mkdir build
+cd build
+cmake .. && make
+if [ $? -ne 0 ]; then
+   echo "Build of Client application is failed"
+   exit 1
+fi
+
+#Start server
+gnome-terminal -- $SERVER_APP
+#Start client_1
+gnome-terminal -- $CLEINT_APP
+#Start client_2
+gnome-terminal -- $CLEINT_APP
