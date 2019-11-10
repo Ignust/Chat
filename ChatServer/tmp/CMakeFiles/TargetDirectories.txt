@@ -1,3 +1,0 @@
-/home/andrey/c++/1/Chat/ChatServer/tmp/CMakeFiles/rebuild_cache.dir
-/home/andrey/c++/1/Chat/ChatServer/tmp/CMakeFiles/test.dir
-/home/andrey/c++/1/Chat/ChatServer/tmp/CMakeFiles/edit_cache.dir
