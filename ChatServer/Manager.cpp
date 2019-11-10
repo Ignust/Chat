@@ -11,17 +11,24 @@ using std::flush;
 
 
 #include "Manager.hpp"
-#include"EventHandler.hpp"
+#include "IManagerListener.hpp"
 
 //------------------------------------------------------------------------------------------
-Manager::Manager(EventHandler& eventHandler)
+Manager::Manager()
     : mClients()
     , mMails()
-    , mEvHndlr(eventHandler)
+    , mListener(nullptr)
     , mDataBase()
 //------------------------------------------------------------------------------------------
 {
     //loadClientsFromTheDatabase();
+}
+
+//------------------------------------------------------------------------------------------
+void Manager::setListener(IManagerListener* listener)
+//------------------------------------------------------------------------------------------
+{
+    mListener = listener;
 }
 
 //------------------------------------------------------------------------------------------
@@ -282,7 +289,10 @@ void Manager::processMailDisconnectServer(const CWrapMail&)
 //------------------------------------------------------------------------------------------
 {
     cout << "Manager::processMailDisconnectServer" << endl;
-    mEvHndlr.responseDisconnectServer();
+    if (nullptr != mListener)
+    {
+        mListener->responseDisconnectServer();
+    }
 }
 
 //------------------------------------------------------------------------------------------
@@ -300,7 +310,9 @@ void Manager::processMailDisconnectClient(const CWrapMail& CWrapMail)
                       "[ ChatServer ]: %.100s disconnected you from the server\n"
                       , getClietName(CWrapMail.clientId));
             sendMail(tempMail, it.first);
-            mEvHndlr.responseDisconnectClient(it.first);
+            if (nullptr != mListener) {
+                mListener->responseDisconnectClient(it.first);
+            }
             return;
         }
     }
@@ -320,7 +332,9 @@ void Manager::DisconnectClient(const int clientId)
     snprintf (tempMail.data,sizeof (tempMail.data), "[ ChatServer ]: you was disconnected from the server\n"
               );
     sendMail(tempMail, clientId);
-    mEvHndlr.responseDisconnectClient(clientId);
+    if (nullptr != mListener) {
+       mListener->responseDisconnectClient(clientId);
+    }
 }
 
 //------------------------------------------------------------------------------------------

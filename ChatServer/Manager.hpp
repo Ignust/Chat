@@ -5,21 +5,22 @@
 using std::queue;
 #include <list>
 using std::list;
-#include<map>
+#include <map>
 using std::map;
 
 #include "ClientTypes.hpp"
 #include "MailTypes.hpp"
 #include "DataBase.hpp"
-#include"Tools.hpp"
+#include "Tools.hpp"
 
-//#include"EventHandler.hpp"
-class EventHandler;
+class IManagerListener;
 
 class Manager
 {
 public:
-    Manager(EventHandler&);
+    Manager();
+
+    void setListener(IManagerListener* listener);
 
     void pushClient(const int);
     void popClient(const int);
@@ -52,7 +53,7 @@ private:
 private:
     map<int,Client> mClients;
     queue<CWrapMail> mMails;
-    EventHandler& mEvHndlr;
+    IManagerListener* mListener;
     DataBase mDataBase;
 
 };

@@ -3,15 +3,18 @@
 
 class Server;
 #include "Manager.hpp"
+#include "IManagerListener.hpp"
 
-class EventHandler
+class EventHandler: public IManagerListener
 {
 public:
     EventHandler();
 
     void start[[noreturn]]();
-    void responseDisconnectServer();
-    void responseDisconnectClient(const int);
+
+    //IManagerLister
+    void responseDisconnectServer() override;
+    void responseDisconnectClient(const int) override;
 
 private:
     void subscribeClient();
