@@ -33,8 +33,8 @@ if [ $? -ne 0 ]; then
 fi
 
 #Start server
-gnome-terminal --geometry=140x15 --title="Server app" -- $SERVER_APP
+gnome-terminal --geometry=140x15+0+0 --title="Server app" -- $SERVER_APP
 #Start client_1
-gnome-terminal --geometry=70x15 --title="Client #1" -- $CLEINT_APP
+gnome-terminal --geometry=65x15+0+360 --title="Client #1" -- $CLEINT_APP
 #Start client_2
-gnome-terminal --geometry=70x15 --title="Client #2" -- $CLEINT_APP
+gnome-terminal --geometry=65x15+720+360 --title="Client #2" -- $CLEINT_APP
