@@ -26,6 +26,7 @@ private:
     void processingCommandHelp();
     void processingCommandDisconnectServer();
     void processingCommandDisconnectClient();
+    void processingCommandExit();
 
     void processingInputCommand(const Mail&);
     void checkMessenger();

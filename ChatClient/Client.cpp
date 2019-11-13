@@ -110,6 +110,10 @@ void Client::processingInputCommand( const Mail& mail)
         processingCommandDisconnectClient();
         return;
     }
+    if (0 == strcmp ("/exit\n", mail.data) ) {
+        processingCommandExit();
+        return;
+    }
 
     cout <<"Wrong command, enter /help for to get more information about commands" << endl;
 }
@@ -120,8 +124,9 @@ void Client::processingCommandHelp()
 {
     cout << "----------CommandHelp-------------" << endl;
 
-    cout << "/ds - disconnect server" << endl;
-    cout << "/dc - disconnect client" << endl;
+    cout << "/ds   - disconnect server" << endl;
+    cout << "/dc   - disconnect client" << endl;
+    cout << "/exit - exit from the program" << endl;
 
     cout << "----------------------------------" << endl;
 }
@@ -166,8 +171,14 @@ void Client::processingCommandDisconnectClient()
         }
         checkMessenger();
     }
-
     }
+
+//-----------------------------------------------------------------------------
+void Client::processingCommandExit()
+//-----------------------------------------------------------------------------
+{
+    std::exit(0);
+}
 
 //-----------------------------------------------------------------------------
 void Client::checkMessenger()
