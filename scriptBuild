@@ -8,10 +8,7 @@ CLEINT_APP=$CLIENT_DIR/build/ChatClient
 
 #Build server application
 cd $SERVER_DIR
-if [ -d "$SERVER_DIR/build" ]; then
-  rm -r build
-fi
-mkdir build
+mkdir -p build
 cd build
 cmake .. && make
 if [ $? -ne 0 ]; then
@@ -21,10 +18,7 @@ fi
 
 #Build Client application
 cd $CLIENT_DIR
-if [ -d "$CLIENT_DIR/build" ]; then
-  rm -r build
-fi
-mkdir build
+mkdir -p build
 cd build
 cmake .. && make
 if [ $? -ne 0 ]; then
