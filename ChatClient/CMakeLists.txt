@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 2.8) # Проверка версии CMake.
 
 project(ChatClient)
 
+
 file(GLOB CPPS "*.cpp")
 
-add_executable(${PROJECT_NAME} ${CPPS})		
+add_executable(${PROJECT_NAME} ${CPPS})
+
+

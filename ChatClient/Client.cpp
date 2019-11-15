@@ -11,7 +11,7 @@
 using namespace std;
 
 #include "Client.hpp"
-#include "MailTypes.hpp"
+#include "./Mail/MailTypes.hpp"
 
 //-----------------------------------------------------------------------------
 Client::Client()
