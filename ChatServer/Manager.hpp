@@ -12,6 +12,7 @@ using std::map;
 #include "MailTypes.hpp"
 #include "DataBase.hpp"
 #include "Tools.hpp"
+#include"CWrapMail.hpp"
 
 class IManagerListener;
 
