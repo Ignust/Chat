@@ -5,5 +5,5 @@ int main()
     EventHandler chatServer;
     chatServer.start();
 
-    return 0;
+    //return 0;
 }

@@ -1,0 +1,7 @@
+*.pro
+*.user
+*.txt
+
+#Folders
+build
+.project

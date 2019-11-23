@@ -1,0 +1,34 @@
+#!/bin/bash
+
+CURRENT_DIR="$PWD"
+SERVER_DIR=$CURRENT_DIR/ChatServer
+CLIENT_DIR=$CURRENT_DIR/ChatClient
+SERVER_APP=$SERVER_DIR/build/ChatServer
+CLEINT_APP=$CLIENT_DIR/build/ChatClient
+
+#Build server application
+cd $SERVER_DIR
+mkdir -p build
+cd build
+cmake .. && make
+if [ $? -ne 0 ]; then
+   echo "Build of Server application is failed"
+   exit 1
+fi
+
+#Build Client application
+cd $CLIENT_DIR
+mkdir -p build
+cd build
+cmake .. && make
+if [ $? -ne 0 ]; then
+   echo "Build of Client application is failed"
+   exit 1
+fi
+
+#Start server
+gnome-terminal --geometry=140x15+0+0 --title="Server app" -- $SERVER_APP
+#Start client_1
+gnome-terminal --geometry=65x15+0+360 --title="Client #1" -- $CLEINT_APP
+#Start client_2
+gnome-terminal --geometry=65x15+720+360 --title="Client #2" -- $CLEINT_APP
