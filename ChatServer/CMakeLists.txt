@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.8)
 project(ChatServer)
     
 set(SOURCE_EXE main.cpp)   
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 include_directories(CWrapMail)
 include_directories(DataBase)
