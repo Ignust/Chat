@@ -1,7 +1,8 @@
 *.pro
 *.user
-*.txt
+#*.txt
 
 #Folders
-build
+#build
 .project
+.cproject
