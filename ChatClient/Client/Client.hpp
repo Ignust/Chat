@@ -3,17 +3,17 @@
 
 #include <netinet/in.h>
 #include <sys/select.h>
+#include <string>
 
 #define PORT_ADDR 12345
 #define AMOUNT_EVENTS 5
-#define ARRAY_SIZE 20
 
 struct Mail;
 
 class Client
 {
 public:
-    Client();
+    Client(int arraySzie, char* arrayLogin[]);
     void start[[noreturn]]();
     void disconnectClient();
 
@@ -30,9 +30,9 @@ private:
 
     void processingInputCommand(const Mail&);
     void checkMessenger();
-    char* getmClientName();
-    void getClientPassword(char *);
-    void sendClientLogin(char *);
+    void getmClientName();
+    void getClientPassword();
+    void sendClientLogin();
     bool createSocket();
     bool connectSocket();
     void processMailType(const Mail&);
@@ -44,7 +44,8 @@ private:
 private:
     int mSocket;
     fd_set mSet;
-    char mClientName[ARRAY_SIZE];
+    std::string mClientName;
+    std::string mClientPassword;
     bool mOutput;
 };
 

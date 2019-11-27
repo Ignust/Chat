@@ -14,13 +14,20 @@ using namespace std;
 #include "MailTypes.hpp"
 
 //-----------------------------------------------------------------------------
-Client::Client()
+Client::Client(int arraySzie, char* arrayLogin[])
     : mSocket(0)
     , mSet()
+    , mClientName()
+    , mClientPassword()
     , mOutput(false)
 //-----------------------------------------------------------------------------
 {
-    memset(mClientName, 0, sizeof (mClientName));
+    if(arraySzie == 3){
+        mClientName = arrayLogin[1];
+        mClientPassword = arrayLogin[2];
+        cout << "Name: " << mClientName << " Password: " <<mClientPassword << endl;
+    }
+
     if (!initClient()) {
         cout << "Client::Client: Client was not init" << endl;
     }
@@ -37,7 +44,7 @@ bool Client::initClient()
 void Client::start[[noreturn]]()
 //-----------------------------------------------------------------------------
 {
-    sendClientLogin(getmClientName());
+    sendClientLogin();
 
     while (true) {
         checkMessenger();
@@ -202,35 +209,41 @@ void Client::checkMessenger()
 }
 
 //-----------------------------------------------------------------------------
-char* Client::getmClientName()
+void Client::getmClientName()
 //-----------------------------------------------------------------------------
 {
+    mClientName.clear();
     cout << "Enter Name" << endl;
     cin >> mClientName;
-    return mClientName;
 }
 
 //-----------------------------------------------------------------------------
-void Client::getClientPassword(char* password)
+void Client::getClientPassword()
 //-----------------------------------------------------------------------------
 {
+    mClientPassword.clear();
     cout << "Enter password" << endl;
-    cin >> password;
+    cin >> mClientPassword;
 }
 
 //-----------------------------------------------------------------------------
-void Client::sendClientLogin(char * name)
+void Client::sendClientLogin()
 //-----------------------------------------------------------------------------
 {
-    char clientPassword[ARRAY_SIZE] = {};
-    getClientPassword(clientPassword);
-    char clientLogin[ARRAY_SIZE * 2] = {};
-    snprintf(clientLogin, sizeof (clientLogin),"%s %s", name, clientPassword);
+    if(mClientName.empty()){
+        getmClientName();
+        getClientPassword();
+    }
+
+    string login;
+    login = mClientName;
+    login.append(" ");
+    login+= mClientPassword;
 
     Mail tempMail;
     tempMail.typeMail = CLIENT_LOGIN;
     memset(tempMail.data, 0 ,sizeof (tempMail.data));
-    strncpy(tempMail.data, clientLogin, sizeof (mClientName));
+    strncpy(tempMail.data, login.c_str(), sizeof (login.size()));
     sendMail(tempMail);
 }
 
@@ -305,12 +318,12 @@ void Client::processMailCommand(const Mail& mail)
 void Client::processMailClientLOgin(const Mail& mail)
 //-----------------------------------------------------------------------------
 {
-    if (0 == strcmp(mail.data, mClientName)) {
+    if (0 == strcmp(mail.data, mClientName.c_str())) {
         cout << "Log in to the server with a nickname: " << mClientName << endl;
     } else{
-        memset(mClientName, 0,sizeof(mClientName));
+        mClientName.clear();
         cout << mail.data << endl;
-        sendClientLogin(getmClientName());
+        sendClientLogin();
     }
 }
 
@@ -323,6 +336,7 @@ void Client::processMailDisconnectClient(const Mail& mail)
     }
 
     if (createSocket() && connectSocket()) {
-        sendClientLogin(getmClientName());
+        mClientName.clear();
+        sendClientLogin();
     }
 }
